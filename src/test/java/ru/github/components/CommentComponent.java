@@ -16,19 +16,19 @@ public class CommentComponent extends BaseComponent {
     private final SelenideElement commentText;
     private final SelenideElement editButton;
     private final SelenideElement deleteButton;
-    
+
     /**
-     * Конструктор компонента комментария
-     * @param commentElement элемент комментария
+     * Конструктор компонента комментария по тексту
+     * @param commentText текст комментария
      */
-    public CommentComponent(SelenideElement commentElement) {
-        this.commentElement = commentElement;
+    public CommentComponent(String commentText) {
+        this.commentElement = $x("//div[contains(@class, 'comment-body') and contains(text(), '" + commentText + "')]");
         this.authorLink = commentElement.$(".author");
         this.commentText = commentElement.$(".comment-body");
         this.editButton = commentElement.$x(".//button[contains(text(), 'Edit')]");
         this.deleteButton = commentElement.$x(".//button[contains(text(), 'Delete')]");
         
-        log.info("Инициализация компонента комментария");
+        log.info("Инициализация компонента комментария по тексту: {}", commentText);
     }
     
     /**

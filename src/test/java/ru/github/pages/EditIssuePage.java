@@ -14,11 +14,12 @@ public class EditIssuePage extends BasePage {
     private static final String SAVE_BUTTON_TEXT = "Save";
     private static final String CANCEL_BUTTON_TEXT = "Cancel";
     
-    private final SelenideElement titleField = $("#issue_title");
-    private final SelenideElement descriptionField = $("#issue_body");
-    private final SelenideElement saveButton = $x("//button[contains(@class, 'btn-primary') and contains(text(), 'Save')]");
-    private final SelenideElement cancelButton = $x("//button[contains(@class, 'btn') and contains(text(), 'Cancel')]");
-    
+    private final SelenideElement titleField = $x("//input[@name='issue[title]'] | //input[contains(@placeholder, 'Title')] | //input[contains(@aria-label, 'Title')]");
+    private final SelenideElement descriptionField = $x("//textarea[@name='issue[body]'] | //textarea[contains(@placeholder, 'comment')] | //textarea[contains(@aria-label, 'Comment')]");
+    private final SelenideElement saveButton = $x("//button[contains(text(), 'Update issue')] | //button[contains(text(), 'Save')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
+    private final SelenideElement cancelButton = $x("//button[contains(text(), 'Cancel')] | //a[contains(text(), 'Cancel')]");
+    private final SelenideElement editButton = $x("//button[@data-testid='edit-issue-title-button'] | //button[contains(text(), 'Edit')] | //a[contains(text(), 'Edit')]");
+
     /**
      * Конструктор страницы редактирования issue
      */

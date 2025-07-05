@@ -18,7 +18,6 @@ public class CommentsTest extends BaseTest {
 
     @Test
     public void testAddCommentToIssue() {
-        // Создание нового issue для тестирования
         RepositoryPage repositoryPage = authService.auth()
                 .navigateToTestRepository();
         
@@ -29,23 +28,12 @@ public class CommentsTest extends BaseTest {
                 .fillDescription(ISSUE_DESCRIPTION)
                 .clickCreate();
 
-        // Попытка добавить комментарий
-        try {
-            issueDetailsPage.addComment(COMMENT_TEXT);
-            log.info("Комментарий успешно добавлен");
-            
-            // В идеале здесь была бы проверка, что комментарий появился
-            // Но в React версии GitHub это требует дополнительного ожидания и поиска
-        } catch (Exception e) {
-            log.warn("Не удалось добавить комментарий. Возможно, функция недоступна для данного пользователя: {}", e.getMessage());
-            // Пропускаем тест, если функция недоступна
-            org.junit.jupiter.api.Assumptions.assumeTrue(false, "Добавление комментариев недоступно");
-        }
+        issueDetailsPage.addComment(COMMENT_TEXT);
+        log.info("Комментарий успешно добавлен");
     }
 
     @Test
     public void testLockConversation() {
-        // Создание нового issue для тестирования
         RepositoryPage repositoryPage = authService.auth()
                 .navigateToTestRepository();
         
@@ -56,17 +44,9 @@ public class CommentsTest extends BaseTest {
                 .fillDescription(ISSUE_DESCRIPTION)
                 .clickCreate();
 
-        // Попытка заблокировать обсуждение
-        try {
-            issueDetailsPage.clickLockConversation();
-            log.info("Обсуждение успешно заблокировано");
-            
-            // Проверяем, что обсуждение заблокировано
-            assertTrue(issueDetailsPage.isConversationLocked(), "Обсуждение должно быть заблокировано");
-        } catch (Exception e) {
-            log.warn("Не удалось заблокировать обсуждение. Возможно, функция недоступна для данного пользователя: {}", e.getMessage());
-            // Пропускаем тест, если функция недоступна
-            org.junit.jupiter.api.Assumptions.assumeTrue(false, "Блокировка обсуждения недоступна");
-        }
+        issueDetailsPage.clickLockConversation();
+        log.info("Обсуждение успешно заблокировано");
+        
+        assertTrue(issueDetailsPage.isConversationLocked(), "Обсуждение должно быть заблокировано");
     }
 }

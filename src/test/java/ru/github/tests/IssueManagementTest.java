@@ -17,7 +17,6 @@ public class IssueManagementTest extends BaseTest {
 
     @Test
     public void testCloseIssue() {
-        // Создание нового issue для тестирования
         RepositoryPage repositoryPage = authService.auth()
                 .navigateToTestRepository();
         
@@ -28,25 +27,19 @@ public class IssueManagementTest extends BaseTest {
                 .fillDescription(ISSUE_DESCRIPTION)
                 .clickCreate();
 
-        // Проверяем, что issue открыта
         assertTrue(issueDetailsPage.isOpen(), "Issue должна быть открыта");
 
-        // Попытка закрыть issue
-        try {
-            issueDetailsPage.clickClose();
-            
-            // Проверяем, что issue закрыта
-            assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
-        } catch (Exception e) {
-            log.warn("Не удалось закрыть issue. Возможно, функция недоступна для данного пользователя: {}", e.getMessage());
-            // Пропускаем тест, если функция недоступна
-            org.junit.jupiter.api.Assumptions.assumeTrue(false, "Закрытие issue недоступно");
-        }
+        log.info("Текущий статус до закрытия: {}", issueDetailsPage.getStatus());
+        issueDetailsPage.clickClose();
+
+        String finalStatus = issueDetailsPage.getStatus();
+        log.info("Статус после попытки закрытия: {}", finalStatus);
+        
+        assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
     }
 
     @Test
     public void testReopenClosedIssue() {
-        // Создание и закрытие issue
         RepositoryPage repositoryPage = authService.auth()
                 .navigateToTestRepository();
         
@@ -57,23 +50,15 @@ public class IssueManagementTest extends BaseTest {
                 .fillDescription(ISSUE_DESCRIPTION)
                 .clickCreate();
 
-        // Попытка закрыть и переоткрыть issue
-        try {
-            issueDetailsPage.clickClose();
-            assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
-            
-            issueDetailsPage.clickReopen();
-            assertTrue(issueDetailsPage.isOpen(), "Issue должна быть переоткрыта");
-        } catch (Exception e) {
-            log.warn("Не удалось выполнить операции закрытия/переоткрытия issue. Возможно, функция недоступна для данного пользователя: {}", e.getMessage());
-            // Пропускаем тест, если функция недоступна
-            org.junit.jupiter.api.Assumptions.assumeTrue(false, "Управление состоянием issue недоступно");
-        }
+        issueDetailsPage.clickClose();
+        assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
+        
+        issueDetailsPage.clickReopen();
+        assertTrue(issueDetailsPage.isOpen(), "Issue должна быть переоткрыта");
     }
 
     @Test
     public void testPinIssue() {
-        // Создание нового issue для тестирования
         RepositoryPage repositoryPage = authService.auth()
                 .navigateToTestRepository();
         
@@ -84,17 +69,7 @@ public class IssueManagementTest extends BaseTest {
                 .fillDescription(ISSUE_DESCRIPTION)
                 .clickCreate();
 
-        // Попытка закрепить issue
-        try {
-            issueDetailsPage.clickPin();
-            log.info("Issue успешно закреплена");
-            
-            // В реальном приложении здесь была бы проверка статуса закрепления
-            // Но поскольку у нас нет доступа к закрепленным issue, просто логируем успех
-        } catch (Exception e) {
-            log.warn("Не удалось закрепить issue. Возможно, функция недоступна для данного пользователя: {}", e.getMessage());
-            // Пропускаем тест, если функция недоступна
-            org.junit.jupiter.api.Assumptions.assumeTrue(false, "Закрепление issue недоступно");
-        }
+        issueDetailsPage.clickPin();
+        log.info("Issue успешно закреплена");
     }
 }

@@ -12,23 +12,18 @@ import static com.codeborne.selenide.Condition.*;
  */
 public class IssueActionsComponent extends BaseComponent {
     
-    // Обновленные локаторы под реальную структуру GitHub
     private final SelenideElement assigneesSection = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']");
     private final SelenideElement labelsSection = $x("//div[@data-testid='sidebar-section']//h3[text()='Labels']");
     
-    // Правильные кнопки редактирования
     private final SelenideElement editAssigneesButton = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//button[contains(@aria-describedby, 'loading-announcement')]");
     private final SelenideElement editLabelsButton = $x("//div[@data-testid='sidebar-section']//h3[text()='Labels']/..//button[contains(@aria-describedby, 'loading-announcement')]");
     
-    // Элементы для отображения данных
     private final SelenideElement issueLabelsContainer = $("[data-testid='issue-labels']");
     private final SelenideElement assigneesContainer = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//ul");
     
-    // Поля для поиска (появляются после клика)
     private final SelenideElement labelSearchField = $("input[placeholder*='filter' i], input[placeholder*='search' i]");
     private final SelenideElement assigneeSearchField = $("input[placeholder*='search' i], input[placeholder*='type' i]");
     
-    // Элементы результатов поиска
     private final SelenideElement searchResults = $(".ActionList, .prc-ActionList-ActionList-X4RiC");
     private final SelenideElement noResultsMessage = $x("//div[contains(text(), 'No results') or contains(text(), 'not found')]");
     
@@ -88,44 +83,6 @@ public class IssueActionsComponent extends BaseComponent {
     }
     
     /**
-     * Выбирает исполнителя по имени пользователя
-     * @param username имя пользователя
-     */
-    public void selectAssignee(String username) {
-        log.info("Выбор исполнителя: {}", username);
-        clickAssignees();
-        
-        // Обновленный локатор для React версии
-        SelenideElement assigneeCheckbox = $x("//input[@type='checkbox' and contains(@data-value, '" + username + "')]");
-        if (!assigneeCheckbox.exists()) {
-            // Альтернативный способ поиска
-            assigneeCheckbox = $x("//label[contains(text(), '" + username + "')]//input[@type='checkbox']");
-        }
-        if (assigneeCheckbox.exists()) {
-            assigneeCheckbox.shouldBe(visible).click();
-        } else {
-            log.warn("Не удалось найти исполнителя: {}", username);
-        }
-    }
-    
-    /**
-     * Выбирает метку по названию
-     * @param labelName название метки
-     */
-    public void selectLabel(String labelName) {
-        log.info("Выбор метки: {}", labelName);
-        clickLabels();
-        
-        // Обновленный локатор для React версии
-        SelenideElement labelCheckbox = $x("//input[@type='checkbox' and contains(@data-value, '" + labelName + "')]");
-        if (!labelCheckbox.exists()) {
-            // Альтернативный способ поиска
-            labelCheckbox = $x("//label[contains(text(), '" + labelName + "')]//input[@type='checkbox']");
-        }
-        labelCheckbox.shouldBe(visible).click();
-    }
-    
-    /**
      * Ищет метку по названию
      * @param labelName название метки для поиска
      */
@@ -133,7 +90,6 @@ public class IssueActionsComponent extends BaseComponent {
         log.info("Поиск метки: {}", labelName);
         clickLabels();
         
-        // Ждем появления поля поиска
         try {
             if (labelSearchField.exists()) {
                 labelSearchField.shouldBe(visible).setValue(labelName);
@@ -166,7 +122,6 @@ public class IssueActionsComponent extends BaseComponent {
      */
     public boolean isCreateLabelSuggestionVisible(String labelName) {
         try {
-            // Ищем различные варианты предложений создать метку
             return $x("//div[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists() ||
                    $x("//button[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists() ||
                    $x("//span[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists();
@@ -190,46 +145,136 @@ public class IssueActionsComponent extends BaseComponent {
     }
     
     /**
-     * Получает список назначенных исполнителей
-     * @return список имен исполнителей
+     * Выбирает исполнителя для issue
+     * @param username имя пользователя для назначения
      */
-    public java.util.List<String> getAssignees() {
-        ElementsCollection assignees = assigneesSection.$$("[data-testid='assignee-item']");
-        if (assignees.isEmpty()) {
-            // Альтернативный способ для React версии
-            assignees = assigneesSection.$$(".assignee-item");
+    public void selectAssignee(String username) {
+        log.info("Выбор исполнителя: {}", username);
+        clickAssignees();
+        
+        try {
+            SelenideElement userOption = $x("//div[contains(text(), '" + username + "')]");
+            if (userOption.exists()) {
+                userOption.click();
+                log.info("Исполнитель {} выбран", username);
+            } else {
+                log.warn("Не удалось найти исполнителя: {}", username);
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при выборе исполнителя: {}", e.getMessage());
         }
-        return assignees.texts();
     }
     
     /**
-     * Получает список назначенных меток
-     * @return список названий меток
-     */
-    public java.util.List<String> getLabels() {
-        ElementsCollection labels = labelsSection.$$("[data-testid='label-item']");
-        if (labels.isEmpty()) {
-            // Альтернативный способ для React версии
-            labels = labelsSection.$$(".label-item");
-        }
-        return labels.texts();
-    }
-    
-    /**
-     * Проверяет, что указанный пользователь назначен исполнителем
+     * Проверяет, что пользователь назначен исполнителем
      * @param username имя пользователя
      * @return true, если пользователь назначен
      */
     public boolean isAssigneeSelected(String username) {
-        return getAssignees().contains(username);
+        try {
+            return assigneesContainer.exists() && 
+                   $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//a[contains(@href, '" + username + "')]").exists();
+        } catch (Exception e) {
+            log.error("Ошибка при проверке назначения: {}", e.getMessage());
+            return false;
+        }
     }
     
     /**
-     * Проверяет, что указанная метка назначена
+     * Выбирает метку для issue
      * @param labelName название метки
-     * @return true, если метка назначена
+     */
+    public void selectLabel(String labelName) {
+        log.info("Выбор метки: {}", labelName);
+        clickLabels();
+        
+        try {
+            SelenideElement labelOption = $x("//div[contains(text(), '" + labelName + "')]");
+            if (labelOption.exists()) {
+                labelOption.click();
+                log.info("Метка {} выбрана", labelName);
+            } else {
+                log.warn("Не удалось найти метку: {}", labelName);
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при выборе метки: {}", e.getMessage());
+        }
+    }
+    
+    /**
+     * Проверяет, что метка выбрана
+     * @param labelName название метки
+     * @return true, если метка выбрана
      */
     public boolean isLabelSelected(String labelName) {
-        return getLabels().contains(labelName);
+        try {
+            return issueLabelsContainer.exists() && 
+                   $x("//div[@data-testid='issue-labels']//span[contains(text(), '" + labelName + "')]").exists();
+        } catch (Exception e) {
+            log.error("Ошибка при проверке метки: {}", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Назначает текущего пользователя исполнителем
+     */
+    public void assignYourself() {
+        log.info("Назначение себя исполнителем");
+        clickAssignees();
+        
+        try {
+            SelenideElement assignYourselfOption = $x("//div[contains(text(), 'Assign yourself')]");
+            if (assignYourselfOption.exists()) {
+                assignYourselfOption.click();
+                log.info("Пользователь назначен исполнителем");
+            } else {
+                log.warn("Опция 'Assign yourself' не найдена");
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при назначении себя исполнителем: {}", e.getMessage());
+        }
+    }
+    
+    /**
+     * Проверяет, что текущий пользователь назначен исполнителем
+     * @return true, если текущий пользователь назначен
+     */
+    public boolean isCurrentUserAssigned() {
+        try {
+            return assigneesContainer.exists() && 
+                   $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//img[contains(@alt, '@')]").exists();
+        } catch (Exception e) {
+            log.error("Ошибка при проверке назначения текущего пользователя: {}", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Получает список всех назначенных исполнителей
+     * @return список имен исполнителей
+     */
+    public java.util.List<String> getAssignees() {
+        try {
+            ElementsCollection assigneeElements = $$x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//a");
+            return assigneeElements.texts();
+        } catch (Exception e) {
+            log.error("Ошибка при получении списка исполнителей: {}", e.getMessage());
+            return java.util.Collections.emptyList();
+        }
+    }
+    
+    /**
+     * Получает список всех меток
+     * @return список названий меток
+     */
+    public java.util.List<String> getLabels() {
+        try {
+            ElementsCollection labelElements = $$x("//div[@data-testid='issue-labels']//span");
+            return labelElements.texts();
+        } catch (Exception e) {
+            log.error("Ошибка при получении списка меток: {}", e.getMessage());
+            return java.util.Collections.emptyList();
+        }
     }
 }

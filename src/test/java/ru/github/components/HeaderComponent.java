@@ -11,7 +11,6 @@ import static com.codeborne.selenide.Condition.*;
  */
 public class HeaderComponent extends BaseComponent {
     
-    // Обновленные локаторы для React версии GitHub
     private final SelenideElement userMenu = $x("//button[@aria-label='View profile and more'] | //button[contains(@aria-label, 'profile')] | //summary[contains(@aria-label, 'menu')]");
     private final SelenideElement userAvatar = $("img[alt*='@'][data-testid='github-avatar']");
     private final SelenideElement signOutButton = $x("//a[contains(text(), 'Sign out')] | //button[contains(text(), 'Sign out')]");
@@ -19,7 +18,6 @@ public class HeaderComponent extends BaseComponent {
     private final SelenideElement searchField = $("input[name='q']");
     private final SelenideElement githubLogo = $(".octicon-mark-github");
     
-    // Альтернативные локаторы для выпадающего меню
     private final SelenideElement dropdownCaret = $(".dropdown-caret");
     private final SelenideElement userMenuDropdown = $x("//div[@role='menu'] | //div[contains(@class, 'dropdown-menu')]");
     
@@ -48,10 +46,8 @@ public class HeaderComponent extends BaseComponent {
         if (userMenu.exists()) {
             userMenu.shouldBe(visible).click();
         } else if (userAvatar.exists()) {
-            // Альтернативный способ - клик по аватару
             userAvatar.shouldBe(visible).click();
         } else if (dropdownCaret.exists()) {
-            // Старая версия с dropdown-caret
             dropdownCaret.shouldBe(visible).click();
         } else {
             log.warn("Меню пользователя не найдено. Возможно, пользователь не авторизован.");
@@ -99,7 +95,6 @@ public class HeaderComponent extends BaseComponent {
      * @return true, если пользователь авторизован
      */
     public boolean isUserLoggedIn() {
-        // Проверяем наличие аватара или меню пользователя
         return userAvatar.exists() || userMenu.exists() || dropdownCaret.exists();
     }
     

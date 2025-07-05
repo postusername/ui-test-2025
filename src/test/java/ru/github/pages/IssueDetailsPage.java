@@ -22,27 +22,23 @@ public class IssueDetailsPage extends BasePage {
     private static final String CLOSED_STATUS = "Closed";
     private static final String OPEN_STATUS = "Open";
     
-    // Обновленные локаторы для React версии GitHub
     private final SelenideElement issueTitle = $("[data-testid='issue-title']");
     private final SelenideElement issueTitleSticky = $("[data-testid='issue-title-sticky']");
     private final SelenideElement issueDescription = $("[data-testid='markdown-body']");
     private final SelenideElement statusBadge = $("[data-testid='header-state']");
     
-    // Кнопки управления issue - могут быть в меню или отдельно
-    private final SelenideElement editButton = $x("//button[contains(text(), 'Edit')] | //a[contains(text(), 'Edit')]");
-    private final SelenideElement closeButton = $x("//button[contains(text(), 'Close issue')] | //a[contains(text(), 'Close issue')]");
-    private final SelenideElement reopenButton = $x("//button[contains(text(), 'Reopen issue')] | //a[contains(text(), 'Reopen issue')]");
-    private final SelenideElement pinButton = $x("//button[contains(text(), 'Pin issue')] | //a[contains(text(), 'Pin issue')]");
+    private final SelenideElement editButton = $$("[data-testid='edit-issue-title-button']").filterBy(visible).first();
+    private final SelenideElement closeButton = $x("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
+    private final SelenideElement reopenButton = $x("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
+    private final SelenideElement pinButton = $x("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
     private final SelenideElement lockButton = $x("//button[contains(text(), 'Lock conversation')] | //a[contains(text(), 'Lock conversation')]");
     
-    // Альтернативные локаторы для кнопок в меню
     private final SelenideElement actionMenuButton = $x("//button[@aria-label='Issue body actions'] | //button[contains(@aria-label, 'actions')]");
     private final SelenideElement menuEditButton = $x("//div[@role='menu']//button[contains(text(), 'Edit')] | //div[@role='menu']//a[contains(text(), 'Edit')]");
     private final SelenideElement menuCloseButton = $x("//div[@role='menu']//button[contains(text(), 'Close')] | //div[@role='menu']//a[contains(text(), 'Close')]");
-    private final SelenideElement menuPinButton = $x("//div[@role='menu']//button[contains(text(), 'Pin')] | //div[@role='menu']//a[contains(text(), 'Pin')]");
+    private final SelenideElement menuPinButton = $x("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
     private final SelenideElement menuLockButton = $x("//div[@role='menu']//button[contains(text(), 'Lock')] | //div[@role='menu']//a[contains(text(), 'Lock')]");
     
-    // Комментарии - новая React структура
     private final SelenideElement commentField = $("textarea[placeholder*='comment']");
     private final SelenideElement commentButton = $x("//button[contains(text(), 'Comment')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
     private final SelenideElement lockConfirmButton = $x("//button[contains(text(), 'Lock conversation') and contains(@class, 'btn-danger')]");
@@ -103,16 +99,15 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Нажимает кнопку редактирования
-     * @return страница редактирования issue
+     * Нажимает кнопку редактирования issue (inline редактирование)
+     * @return текущая страница
      */
-    public EditIssuePage clickEdit() {
+    public IssueDetailsPage clickEdit() {
         log.info("Нажатие кнопки 'Edit'");
         
         if (editButton.exists()) {
             editButton.shouldBe(visible).click();
         } else {
-            // Пытаемся найти кнопку в меню
             if (actionMenuButton.exists()) {
                 actionMenuButton.shouldBe(visible).click();
                 menuEditButton.shouldBe(visible).click();
@@ -121,7 +116,33 @@ public class IssueDetailsPage extends BasePage {
             }
         }
         
-        return new EditIssuePage();
+        return this;
+    }
+    
+    /**
+     * Редактирует заголовок issue (inline редактирование)
+     * @param newTitle новый заголовок
+     * @return текущая страница
+     */
+    public IssueDetailsPage editTitle(String newTitle) {
+        log.info("Редактирование заголовка issue на: {}", newTitle);
+        
+        clickEdit();
+        
+        SelenideElement titleInput = $x("//input[contains(@class, 'form-control')] | //input[@type='text'] | //input[contains(@aria-label, 'title')]");
+        
+        if (titleInput.exists()) {
+            titleInput.shouldBe(visible).clear();
+            titleInput.setValue(newTitle);
+            
+            titleInput.pressEnter();
+            
+            issueTitle.shouldBe(visible);
+        } else {
+            log.warn("Поле редактирования заголовка не найдено");
+        }
+        
+        return this;
     }
     
     /**
@@ -131,15 +152,36 @@ public class IssueDetailsPage extends BasePage {
     public IssueDetailsPage clickClose() {
         log.info("Нажатие кнопки 'Close issue'");
         
+        String statusBefore = getStatus();
+        log.info("Статус issue до нажатия: {}", statusBefore);
+        
         if (closeButton.exists()) {
+            log.info("Кнопка Close issue найдена, нажимаем");
             closeButton.shouldBe(visible).click();
+            
+            statusBadge.shouldBe(visible);
+            
+            SelenideElement confirmButton = $x("//button[contains(text(), 'Close issue')] | //button[contains(text(), 'Confirm')]");
+            if (confirmButton.exists()) {
+                log.info("Найдена кнопка подтверждения, нажимаем");
+                confirmButton.shouldBe(visible).click();
+            } else {
+                log.info("Кнопка подтверждения не найдена");
+            }
         } else {
-            // Пытаемся найти кнопку в меню
+            log.warn("Кнопка Close issue не найдена в основном интерфейсе");
             if (actionMenuButton.exists()) {
+                log.info("Открываем меню действий");
                 actionMenuButton.shouldBe(visible).click();
                 menuCloseButton.shouldBe(visible).click();
+                
+                SelenideElement confirmButton = $x("//button[contains(text(), 'Close issue')] | //button[contains(text(), 'Confirm')]");
+                if (confirmButton.exists()) {
+                    log.info("Найдена кнопка подтверждения в меню, нажимаем");
+                    confirmButton.shouldBe(visible).click();
+                }
             } else {
-                log.warn("Кнопка Close issue не найдена ни в основном интерфейсе, ни в меню");
+                log.error("Кнопка закрытия issue не найдена");
             }
         }
         
@@ -147,12 +189,18 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Открывает закрытую issue
+     * Переоткрывает issue
      * @return текущая страница
      */
     public IssueDetailsPage clickReopen() {
         log.info("Нажатие кнопки 'Reopen issue'");
-        reopenButton.shouldBe(visible).click();
+        
+        if (reopenButton.exists()) {
+            reopenButton.shouldBe(visible).click();
+        } else {
+            log.warn("Кнопка Reopen issue не найдена");
+        }
+        
         return this;
     }
     
@@ -166,7 +214,6 @@ public class IssueDetailsPage extends BasePage {
         if (pinButton.exists()) {
             pinButton.shouldBe(visible).click();
         } else {
-            // Пытаемся найти кнопку в меню
             if (actionMenuButton.exists()) {
                 actionMenuButton.shouldBe(visible).click();
                 menuPinButton.shouldBe(visible).click();
@@ -179,7 +226,7 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Блокирует комментарии
+     * Блокирует обсуждение issue
      * @return текущая страница
      */
     public IssueDetailsPage clickLockConversation() {
@@ -188,7 +235,6 @@ public class IssueDetailsPage extends BasePage {
         if (lockButton.exists()) {
             lockButton.shouldBe(visible).click();
         } else {
-            // Пытаемся найти кнопку в меню
             if (actionMenuButton.exists()) {
                 actionMenuButton.shouldBe(visible).click();
                 menuLockButton.shouldBe(visible).click();
@@ -205,19 +251,14 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Добавляет комментарий
+     * Добавляет комментарий к issue
      * @param commentText текст комментария
      * @return текущая страница
      */
     public IssueDetailsPage addComment(String commentText) {
         log.info("Добавление комментария: {}", commentText);
-        
-        if (commentField.exists()) {
-            commentField.shouldBe(visible).setValue(commentText);
-            commentButton.shouldBe(visible).click();
-        } else {
-            log.warn("Поле для комментария не найдено. Возможно, пользователь не авторизован.");
-        }
+        commentField.shouldBe(visible).setValue(commentText);
+        commentButton.shouldBe(visible).click();
         
         return this;
     }
@@ -231,54 +272,42 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Получает компонент комментария по тексту
+     * Получает комментарий по тексту
      * @param commentText текст комментария
      * @return компонент комментария
      */
     public CommentComponent getCommentByText(String commentText) {
-        SelenideElement commentElement = $x("//div[contains(@class, 'comment-body') and contains(text(), '" + commentText + "')]");
-        return new CommentComponent(commentElement);
+        return new CommentComponent(commentText);
     }
     
     /**
-     * Проверяет, что комментарии заблокированы
-     * @return true, если комментарии заблокированы
+     * Проверяет, что обсуждение заблокировано
+     * @return true, если обсуждение заблокировано
      */
     public boolean isConversationLocked() {
         return lockedMessage.exists();
     }
     
     /**
-     * Проверяет, что кнопка закрытия заблокирована
-     * @return true, если кнопка заблокирована
+     * Проверяет, что кнопка закрытия недоступна
+     * @return true, если кнопка закрытия недоступна
      */
     public boolean isCloseButtonDisabled() {
-        return closeButton.getAttribute("disabled") != null || !closeButton.exists();
+        return closeButton.exists() && !closeButton.isEnabled();
     }
     
     /**
-     * Получает текст всплывающей подсказки о недостатке прав
+     * Получает текст подсказки о недостатке прав
      * @return текст подсказки
      */
     public String getNoPermissionTooltip() {
-        return noPermissionTooltip.getAttribute("aria-label");
+        return noPermissionTooltip.exists() ? noPermissionTooltip.getAttribute("aria-label") : "";
     }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы деталей issue");
-        // Ждем либо основной заголовок, либо статус, главное чтобы страница загрузилась
-        try {
-            if (issueTitle.exists()) {
-                issueTitle.shouldBe(visible);
-            } else {
-                // Если основной заголовок не найден, проверим что элементы страницы есть
-                statusBadge.shouldBe(visible);
-            }
-        } catch (Exception e) {
-            log.debug("Не удалось найти заголовок issue, проверяем статус: {}", e.getMessage());
-            // Если заголовок не найден, проверяем хотя бы что статус загрузился
-            statusBadge.shouldBe(visible);
-        }
+        statusBadge.shouldBe(visible);
+        issueTitle.shouldBe(visible);
     }
 }
