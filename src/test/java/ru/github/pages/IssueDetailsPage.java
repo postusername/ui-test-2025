@@ -1,52 +1,24 @@
 package ru.github.pages;
 
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BasePage;
-import ru.github.components.IssueActionsComponent;
+import ru.github.components.elements.TextElement;
 import ru.github.components.CommentComponent;
-
-import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
+import ru.github.components.CommentFormComponent;
+import ru.github.components.IssueActionsComponent;
+import ru.github.components.IssueControlsComponent;
+import ru.github.components.IssueInfoComponent;
+import ru.github.pages.BasePage;
 
 /**
  * Страница деталей issue
  */
 public class IssueDetailsPage extends BasePage {
     
-    private static final String EDIT_BUTTON_TEXT = "Edit";
-    private static final String CLOSE_BUTTON_TEXT = "Close issue";
-    private static final String REOPEN_BUTTON_TEXT = "Reopen issue";
-    private static final String PIN_BUTTON_TEXT = "Pin issue";
-    private static final String LOCK_BUTTON_TEXT = "Lock conversation";
-    private static final String COMMENT_BUTTON_TEXT = "Comment";
-    private static final String CLOSED_STATUS = "Closed";
-    private static final String OPEN_STATUS = "Open";
-    
-    private final SelenideElement issueTitle = $("[data-testid='issue-title']");
-    private final SelenideElement issueTitleSticky = $("[data-testid='issue-title-sticky']");
-    private final SelenideElement issueDescription = $("[data-testid='markdown-body']");
-    private final SelenideElement statusBadge = $("[data-testid='header-state']");
-    
-    private final SelenideElement editButton = $$("[data-testid='edit-issue-title-button']").filterBy(visible).first();
-    private final SelenideElement closeButton = $x("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
-    private final SelenideElement reopenButton = $x("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
-    private final SelenideElement pinButton = $x("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
-    private final SelenideElement lockButton = $x("//button[contains(text(), 'Lock conversation')] | //a[contains(text(), 'Lock conversation')]");
-    
-    private final SelenideElement actionMenuButton = $x("//button[@aria-label='Issue body actions'] | //button[contains(@aria-label, 'actions')]");
-    private final SelenideElement menuEditButton = $x("//div[@role='menu']//button[contains(text(), 'Edit')] | //div[@role='menu']//a[contains(text(), 'Edit')]");
-    private final SelenideElement menuCloseButton = $x("//div[@role='menu']//button[contains(text(), 'Close')] | //div[@role='menu']//a[contains(text(), 'Close')]");
-    private final SelenideElement menuPinButton = $x("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
-    private final SelenideElement menuLockButton = $x("//div[@role='menu']//button[contains(text(), 'Lock')] | //div[@role='menu']//a[contains(text(), 'Lock')]");
-    
-    private final SelenideElement commentField = $("textarea[placeholder*='comment']");
-    private final SelenideElement commentButton = $x("//button[contains(text(), 'Comment')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
-    private final SelenideElement lockConfirmButton = $x("//button[contains(text(), 'Lock conversation') and contains(@class, 'btn-danger')]");
-    private final SelenideElement lockedMessage = $x("//div[contains(text(), 'locked')] | //div[contains(@class, 'locked')]");
-    private final SelenideElement noPermissionTooltip = $("[aria-label*='permission']");
-    
+    private final IssueInfoComponent issueInfo = new IssueInfoComponent();
+    private final IssueControlsComponent issueControls = new IssueControlsComponent();
+    private final CommentFormComponent commentForm = new CommentFormComponent();
     private final IssueActionsComponent issueActions = new IssueActionsComponent();
-    
+    private final TextElement permissionsTooltip = TextElement.byAriaLabel("permission");
+
     /**
      * Конструктор страницы деталей issue
      */
@@ -60,10 +32,7 @@ public class IssueDetailsPage extends BasePage {
      * @return заголовок issue
      */
     public String getTitle() {
-        if (issueTitle.exists()) {
-            return issueTitle.shouldBe(visible).getText();
-        }
-        return issueTitleSticky.shouldBe(visible).getText();
+        return issueInfo.getTitle();
     }
     
     /**
@@ -71,7 +40,7 @@ public class IssueDetailsPage extends BasePage {
      * @return описание issue
      */
     public String getDescription() {
-        return issueDescription.shouldBe(visible).getText();
+        return issueInfo.getDescription();
     }
     
     /**
@@ -79,69 +48,42 @@ public class IssueDetailsPage extends BasePage {
      * @return статус issue
      */
     public String getStatus() {
-        return statusBadge.shouldBe(visible).getText();
+        return issueInfo.getStatus();
     }
     
     /**
      * Проверяет, что issue открыта
      * @return true, если issue открыта
      */
-    public boolean isOpen() {
-        return statusBadge.shouldBe(visible).getText().contains(OPEN_STATUS);
+    public boolean isIssueStatusOpen() {
+        return issueInfo.isIssueStatusOpen();
     }
     
     /**
      * Проверяет, что issue закрыта
      * @return true, если issue закрыта
      */
-    public boolean isClosed() {
-        return statusBadge.shouldBe(visible).getText().contains(CLOSED_STATUS);
+    public boolean isIssueStatusClosed() {
+        return issueInfo.isIssueStatusClosed();
     }
     
     /**
-     * Нажимает кнопку редактирования issue (inline редактирование)
+     * Нажимает кнопку редактирования issue
      * @return текущая страница
      */
     public IssueDetailsPage clickEdit() {
-        log.info("Нажатие кнопки 'Edit'");
-        
-        if (editButton.exists()) {
-            editButton.shouldBe(visible).click();
-        } else {
-            if (actionMenuButton.exists()) {
-                actionMenuButton.shouldBe(visible).click();
-                menuEditButton.shouldBe(visible).click();
-            } else {
-                log.warn("Кнопка Edit не найдена ни в основном интерфейсе, ни в меню");
-            }
-        }
-        
+        issueControls.clickEdit();
         return this;
     }
     
     /**
-     * Редактирует заголовок issue (inline редактирование)
+     * Редактирует заголовок issue
      * @param newTitle новый заголовок
      * @return текущая страница
      */
     public IssueDetailsPage editTitle(String newTitle) {
-        log.info("Редактирование заголовка issue на: {}", newTitle);
-        
         clickEdit();
-        
-        SelenideElement titleInput = $x("//input[contains(@class, 'form-control')] | //input[@type='text'] | //input[contains(@aria-label, 'title')]");
-        
-        if (titleInput.exists()) {
-            titleInput.shouldBe(visible).clear();
-            titleInput.setValue(newTitle);
-            
-            titleInput.pressEnter();
-            
-            issueTitle.shouldBe(visible);
-        } else {
-            log.warn("Поле редактирования заголовка не найдено");
-        }
-        
+        issueInfo.editTitle(newTitle);
         return this;
     }
     
@@ -150,41 +92,7 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage clickClose() {
-        log.info("Нажатие кнопки 'Close issue'");
-        
-        String statusBefore = getStatus();
-        log.info("Статус issue до нажатия: {}", statusBefore);
-        
-        if (closeButton.exists()) {
-            log.info("Кнопка Close issue найдена, нажимаем");
-            closeButton.shouldBe(visible).click();
-            
-            statusBadge.shouldBe(visible);
-            
-            SelenideElement confirmButton = $x("//button[contains(text(), 'Close issue')] | //button[contains(text(), 'Confirm')]");
-            if (confirmButton.exists()) {
-                log.info("Найдена кнопка подтверждения, нажимаем");
-                confirmButton.shouldBe(visible).click();
-            } else {
-                log.info("Кнопка подтверждения не найдена");
-            }
-        } else {
-            log.warn("Кнопка Close issue не найдена в основном интерфейсе");
-            if (actionMenuButton.exists()) {
-                log.info("Открываем меню действий");
-                actionMenuButton.shouldBe(visible).click();
-                menuCloseButton.shouldBe(visible).click();
-                
-                SelenideElement confirmButton = $x("//button[contains(text(), 'Close issue')] | //button[contains(text(), 'Confirm')]");
-                if (confirmButton.exists()) {
-                    log.info("Найдена кнопка подтверждения в меню, нажимаем");
-                    confirmButton.shouldBe(visible).click();
-                }
-            } else {
-                log.error("Кнопка закрытия issue не найдена");
-            }
-        }
-        
+        issueControls.clickClose();
         return this;
     }
     
@@ -193,14 +101,7 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage clickReopen() {
-        log.info("Нажатие кнопки 'Reopen issue'");
-        
-        if (reopenButton.exists()) {
-            reopenButton.shouldBe(visible).click();
-        } else {
-            log.warn("Кнопка Reopen issue не найдена");
-        }
-        
+        issueControls.clickReopen();
         return this;
     }
     
@@ -209,19 +110,7 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage clickPin() {
-        log.info("Нажатие кнопки 'Pin issue'");
-        
-        if (pinButton.exists()) {
-            pinButton.shouldBe(visible).click();
-        } else {
-            if (actionMenuButton.exists()) {
-                actionMenuButton.shouldBe(visible).click();
-                menuPinButton.shouldBe(visible).click();
-            } else {
-                log.warn("Кнопка Pin issue не найдена ни в основном интерфейсе, ни в меню");
-            }
-        }
-        
+        issueControls.clickPin();
         return this;
     }
     
@@ -230,23 +119,7 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage clickLockConversation() {
-        log.info("Нажатие кнопки 'Lock conversation'");
-        
-        if (lockButton.exists()) {
-            lockButton.shouldBe(visible).click();
-        } else {
-            if (actionMenuButton.exists()) {
-                actionMenuButton.shouldBe(visible).click();
-                menuLockButton.shouldBe(visible).click();
-            } else {
-                log.warn("Кнопка Lock conversation не найдена ни в основном интерфейсе, ни в меню");
-            }
-        }
-        
-        if (lockConfirmButton.exists()) {
-            lockConfirmButton.shouldBe(visible).click();
-        }
-        
+        issueControls.clickLockConversation();
         return this;
     }
     
@@ -256,10 +129,7 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage addComment(String commentText) {
-        log.info("Добавление комментария: {}", commentText);
-        commentField.shouldBe(visible).setValue(commentText);
-        commentButton.shouldBe(visible).click();
-        
+        commentForm.addComment(commentText);
         return this;
     }
     
@@ -269,6 +139,38 @@ public class IssueDetailsPage extends BasePage {
      */
     public IssueActionsComponent getIssueActions() {
         return issueActions;
+    }
+    
+    /**
+     * Получает компонент информации о issue
+     * @return компонент информации
+     */
+    public IssueInfoComponent getIssueInfo() {
+        return issueInfo;
+    }
+    
+    /**
+     * Получает компонент управления issue
+     * @return компонент управления
+     */
+    public IssueControlsComponent getIssueControls() {
+        return issueControls;
+    }
+    
+    /**
+     * Получает компонент формы комментариев
+     * @return компонент формы комментариев
+     */
+    public CommentFormComponent getCommentForm() {
+        return commentForm;
+    }
+    
+    /**
+     * Получает элемент подсказки о правах доступа
+     * @return элемент подсказки
+     */
+    public TextElement getPermissions() {
+        return permissionsTooltip;
     }
     
     /**
@@ -285,7 +187,7 @@ public class IssueDetailsPage extends BasePage {
      * @return true, если обсуждение заблокировано
      */
     public boolean isConversationLocked() {
-        return lockedMessage.exists();
+        return issueControls.isConversationLocked();
     }
     
     /**
@@ -293,7 +195,7 @@ public class IssueDetailsPage extends BasePage {
      * @return true, если кнопка закрытия недоступна
      */
     public boolean isCloseButtonDisabled() {
-        return closeButton.exists() && !closeButton.isEnabled();
+        return issueControls.isCloseButtonDisabled();
     }
     
     /**
@@ -301,13 +203,12 @@ public class IssueDetailsPage extends BasePage {
      * @return текст подсказки
      */
     public String getNoPermissionTooltip() {
-        return noPermissionTooltip.exists() ? noPermissionTooltip.getAttribute("aria-label") : "";
+        return permissionsTooltip.exists() ? permissionsTooltip.getAttribute("aria-label") : "";
     }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы деталей issue");
-        statusBadge.shouldBe(visible);
-        issueTitle.shouldBe(visible);
+        issueInfo.waitForLoad();
     }
 }

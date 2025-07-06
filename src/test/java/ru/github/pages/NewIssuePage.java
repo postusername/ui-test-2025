@@ -1,23 +1,22 @@
 package ru.github.pages;
 
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BasePage;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextElement;
+import ru.github.components.elements.TextareaElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Страница создания новой issue
  */
 public class NewIssuePage extends BasePage {
-    
-    private static final String SUBMIT_BUTTON_TEXT = "Create";
     private static final String TITLE_EMPTY_ERROR = "Title can not be empty";
     
-    private final SelenideElement titleField = $("input[aria-label='Add a title']");
-    private final SelenideElement descriptionField = $("textarea[placeholder='Type your description here…']");
-    private final SelenideElement submitButton = $("button[data-testid='create-issue-button']");
-    private final SelenideElement titleError = $("#title-validation");
+    private final InputElement titleField = InputElement.byAriaLabel("Add a title");
+    private final TextareaElement descriptionField = TextareaElement.byPlaceholder("Type your description here…");
+    private final ButtonElement submitButton = ButtonElement.byTestId("create-issue-button");
+    private final TextElement titleError = TextElement.byId("title-validation");
     
     /**
      * Конструктор страницы создания новой issue
@@ -33,8 +32,7 @@ public class NewIssuePage extends BasePage {
      * @return текущая страница
      */
     public NewIssuePage fillTitle(String title) {
-        log.info("Заполнение заголовка issue: {}", title);
-        titleField.shouldBe(visible).setValue(title);
+        fillField(titleField, title, "заголовок issue");
         return this;
     }
     
@@ -44,8 +42,7 @@ public class NewIssuePage extends BasePage {
      * @return текущая страница
      */
     public NewIssuePage fillDescription(String description) {
-        log.info("Заполнение описания issue");
-        descriptionField.shouldBe(visible).setValue(description);
+        fillTextarea(descriptionField, description, "описание issue");
         return this;
     }
     
@@ -54,8 +51,7 @@ public class NewIssuePage extends BasePage {
      * @return текущая страница
      */
     public NewIssuePage clearTitle() {
-        log.info("Очистка поля заголовка");
-        titleField.shouldBe(visible).clear();
+        clearField(titleField, "заголовок issue");
         return this;
     }
     
@@ -65,7 +61,7 @@ public class NewIssuePage extends BasePage {
      */
     public IssueDetailsPage clickSubmit() {
         log.info("Нажатие кнопки 'Create'");
-        submitButton.shouldBe(visible).click();
+        submitButton.click();
         return new IssueDetailsPage();
     }
     
@@ -83,7 +79,7 @@ public class NewIssuePage extends BasePage {
      */
     public NewIssuePage clickSubmitWithEmptyTitle() {
         log.info("Попытка создания issue с пустым заголовком");
-        submitButton.shouldBe(visible).click();
+        submitButton.click();
         return this;
     }
     
@@ -100,7 +96,7 @@ public class NewIssuePage extends BasePage {
      * @return текст ошибки
      */
     public String getErrorMessage() {
-        return titleError.shouldBe(visible).getText();
+        return getErrorText(titleError);
     }
     
     /**
@@ -108,22 +104,20 @@ public class NewIssuePage extends BasePage {
      * @return true, если ошибка отображается
      */
     public boolean isEmptyTitleErrorDisplayed() {
-        return titleError.isDisplayed() && titleError.getText().contains(TITLE_EMPTY_ERROR);
+        return hasErrorWithText(titleError, TITLE_EMPTY_ERROR);
     }
     
     /**
      * Проверяет наличие ошибки валидации (альтернативное название для совместимости)
      * @return true, если есть ошибка валидации
      */
-    public boolean hasValidationError() {
-        return titleError.exists() && titleError.isDisplayed();
+    public boolean isErrorDisplayed() {
+        return hasError(titleError);
     }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы создания новой issue");
-        titleField.shouldBe(visible);
-        descriptionField.shouldBe(visible);
-        submitButton.shouldBe(visible);
+        waitForElementsVisible(titleField, descriptionField, submitButton);
     }
 }

@@ -2,30 +2,32 @@ package ru.github.components;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BaseComponent;
+import ru.github.components.BaseComponent;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Компонент боковой панели управления issue (Assignees, Labels)
  */
 public class IssueActionsComponent extends BaseComponent {
     
-    private final SelenideElement assigneesSection = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']");
-    private final SelenideElement labelsSection = $x("//div[@data-testid='sidebar-section']//h3[text()='Labels']");
+    private final TextElement assigneesSection = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']");
+    private final TextElement labelsSection = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Labels']");
     
-    private final SelenideElement editAssigneesButton = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//button[contains(@aria-describedby, 'loading-announcement')]");
-    private final SelenideElement editLabelsButton = $x("//div[@data-testid='sidebar-section']//h3[text()='Labels']/..//button[contains(@aria-describedby, 'loading-announcement')]");
+    private final ButtonElement editAssigneesButton = ButtonElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//button[contains(@aria-describedby, 'loading-announcement')]");
+    private final ButtonElement editLabelsButton = ButtonElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Labels']/..//button[contains(@aria-describedby, 'loading-announcement')]");
     
-    private final SelenideElement issueLabelsContainer = $("[data-testid='issue-labels']");
-    private final SelenideElement assigneesContainer = $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//ul");
+    private final TextElement issueLabelsContainer = TextElement.byCssSelector("[data-testid='issue-labels']");
+    private final TextElement assigneesContainer = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//ul");
     
-    private final SelenideElement labelSearchField = $("input[placeholder*='filter' i], input[placeholder*='search' i]");
-    private final SelenideElement assigneeSearchField = $("input[placeholder*='search' i], input[placeholder*='type' i]");
+    private final InputElement labelSearchField = InputElement.byCssSelector("input[placeholder*='filter' i], input[placeholder*='search' i]");
+    private final InputElement assigneeSearchField = InputElement.byCssSelector("input[placeholder*='search' i], input[placeholder*='type' i]");
     
-    private final SelenideElement searchResults = $(".ActionList, .prc-ActionList-ActionList-X4RiC");
-    private final SelenideElement noResultsMessage = $x("//div[contains(text(), 'No results') or contains(text(), 'not found')]");
+    private final TextElement searchResults = TextElement.byCssSelector(".ActionList, .prc-ActionList-ActionList-X4RiC");
+    private final TextElement noResultsMessage = TextElement.byXpath("//div[contains(text(), 'No results') or contains(text(), 'not found')]");
     
     /**
      * Конструктор компонента действий с issue
@@ -57,7 +59,7 @@ public class IssueActionsComponent extends BaseComponent {
         log.info("Клик по кнопке редактирования назначений");
         try {
             if (editAssigneesButton.exists()) {
-                editAssigneesButton.shouldBe(visible).click();
+                editAssigneesButton.click();
             } else {
                 log.warn("Кнопка редактирования назначений не найдена");
             }
@@ -73,7 +75,7 @@ public class IssueActionsComponent extends BaseComponent {
         log.info("Клик по кнопке редактирования меток");
         try {
             if (editLabelsButton.exists()) {
-                editLabelsButton.shouldBe(visible).click();
+                editLabelsButton.click();
             } else {
                 log.warn("Кнопка редактирования меток не найдена");
             }
@@ -92,7 +94,7 @@ public class IssueActionsComponent extends BaseComponent {
         
         try {
             if (labelSearchField.exists()) {
-                labelSearchField.shouldBe(visible).setValue(labelName);
+                labelSearchField.setValue(labelName);
             } else {
                 log.warn("Поле поиска меток не найдено");
             }

@@ -1,26 +1,28 @@
 package ru.github.components;
 
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BaseComponent;
+import ru.github.components.BaseComponent;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.ImageElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Компонент заголовка страницы с навигацией
  */
 public class HeaderComponent extends BaseComponent {
     
-    private final SelenideElement userMenu = $x("//button[@aria-label='View profile and more'] | //button[contains(@aria-label, 'profile')] | //summary[contains(@aria-label, 'menu')]");
-    private final SelenideElement userAvatar = $("img[alt*='@'][data-testid='github-avatar']");
-    private final SelenideElement signOutButton = $x("//a[contains(text(), 'Sign out')] | //button[contains(text(), 'Sign out')]");
-    private final SelenideElement profileLink = $x("//a[contains(text(), 'Your profile')] | //a[contains(@href, '/profile')]");
-    private final SelenideElement searchField = $("input[name='q']");
-    private final SelenideElement githubLogo = $(".octicon-mark-github");
+    private final ButtonElement userMenu = ButtonElement.byXpath("//button[@aria-label='View profile and more'] | //button[contains(@aria-label, 'profile')] | //summary[contains(@aria-label, 'menu')]");
+    private final ImageElement userAvatar = ImageElement.byCssSelector("img[alt*='@'][data-testid='github-avatar']");
+    private final ButtonElement signOutButton = ButtonElement.byXpath("//a[contains(text(), 'Sign out')] | //button[contains(text(), 'Sign out')]");
+    private final ButtonElement profileLink = ButtonElement.byXpath("//a[contains(text(), 'Your profile')] | //a[contains(@href, '/profile')]");
+    private final InputElement searchField = InputElement.byName("q");
+    private final ImageElement githubLogo = ImageElement.byCssSelector(".octicon-mark-github");
     
-    private final SelenideElement dropdownCaret = $(".dropdown-caret");
-    private final SelenideElement userMenuDropdown = $x("//div[@role='menu'] | //div[contains(@class, 'dropdown-menu')]");
-    
+    private final ButtonElement dropdownCaret = ButtonElement.byCssSelector(".dropdown-caret");
+    private final TextElement userMenuDropdown = TextElement.byXpath("//div[@role='menu'] | //div[contains(@class, 'dropdown-menu')]");
+
     /**
      * Конструктор компонента заголовка
      */
@@ -34,7 +36,8 @@ public class HeaderComponent extends BaseComponent {
      */
     public void search(String searchQuery) {
         log.info("Поиск через заголовок: {}", searchQuery);
-        searchField.shouldBe(visible).setValue(searchQuery).pressEnter();
+        searchField.setValue(searchQuery);
+        searchField.pressEnter();
     }
     
     /**
@@ -44,11 +47,11 @@ public class HeaderComponent extends BaseComponent {
         log.info("Открытие меню пользователя");
         
         if (userMenu.exists()) {
-            userMenu.shouldBe(visible).click();
+            userMenu.click();
         } else if (userAvatar.exists()) {
-            userAvatar.shouldBe(visible).click();
+            userAvatar.click();
         } else if (dropdownCaret.exists()) {
-            dropdownCaret.shouldBe(visible).click();
+            dropdownCaret.click();
         } else {
             log.warn("Меню пользователя не найдено. Возможно, пользователь не авторизован.");
         }
@@ -62,7 +65,7 @@ public class HeaderComponent extends BaseComponent {
         openUserMenu();
         
         if (profileLink.exists()) {
-            profileLink.shouldBe(visible).click();
+            profileLink.click();
         } else {
             log.warn("Ссылка на профиль не найдена в меню");
         }
@@ -76,7 +79,7 @@ public class HeaderComponent extends BaseComponent {
         openUserMenu();
         
         if (signOutButton.exists()) {
-            signOutButton.shouldBe(visible).click();
+            signOutButton.click();
         } else {
             log.warn("Кнопка выхода не найдена в меню");
         }
@@ -87,7 +90,7 @@ public class HeaderComponent extends BaseComponent {
      */
     public void clickGitHubLogo() {
         log.info("Переход на главную страницу GitHub");
-        githubLogo.shouldBe(visible).click();
+        githubLogo.click();
     }
     
     /**

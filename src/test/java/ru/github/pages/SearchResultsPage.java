@@ -1,11 +1,11 @@
 package ru.github.pages;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BasePage;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Страница результатов поиска
@@ -13,8 +13,8 @@ import static com.codeborne.selenide.Condition.*;
 public class SearchResultsPage extends BasePage {
     
     private final ElementsCollection searchResults = $$(".repo-list-item");
-    private final SelenideElement noResultsMessage = $(".blankslate");
-    private final SelenideElement searchQuery = $(".search-form input[name='q']");
+    private final TextElement noResultsMessage = TextElement.byCssSelector(".blankslate");
+    private final InputElement searchQuery = InputElement.byCssSelector(".search-form input[name='q']");
     
     /**
      * Конструктор страницы результатов поиска
@@ -42,8 +42,8 @@ public class SearchResultsPage extends BasePage {
      */
     public RepositoryPage clickRepository(String repositoryName) {
         log.info("Переход к репозиторию: {}", repositoryName);
-        SelenideElement repositoryLink = $x("//a[contains(@href, '/" + repositoryName + "')]");
-        repositoryLink.shouldBe(visible).click();
+        ButtonElement repositoryLink = ButtonElement.byXpath("//a[contains(@href, '/" + repositoryName + "')]");
+        repositoryLink.click();
         return new RepositoryPage();
     }
     
@@ -60,12 +60,12 @@ public class SearchResultsPage extends BasePage {
      * @return поисковый запрос
      */
     public String getSearchQuery() {
-        return searchQuery.shouldBe(visible).getValue();
+        return searchQuery.getValue();
     }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы результатов поиска");
-        searchQuery.shouldBe(visible);
+        searchQuery.waitForVisible();
     }
 }

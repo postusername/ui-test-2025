@@ -1,24 +1,21 @@
 package ru.github.pages;
 
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BasePage;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextareaElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Страница редактирования issue
  */
 public class EditIssuePage extends BasePage {
     
-    private static final String SAVE_BUTTON_TEXT = "Save";
-    private static final String CANCEL_BUTTON_TEXT = "Cancel";
-    
-    private final SelenideElement titleField = $x("//input[@name='issue[title]'] | //input[contains(@placeholder, 'Title')] | //input[contains(@aria-label, 'Title')]");
-    private final SelenideElement descriptionField = $x("//textarea[@name='issue[body]'] | //textarea[contains(@placeholder, 'comment')] | //textarea[contains(@aria-label, 'Comment')]");
-    private final SelenideElement saveButton = $x("//button[contains(text(), 'Update issue')] | //button[contains(text(), 'Save')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
-    private final SelenideElement cancelButton = $x("//button[contains(text(), 'Cancel')] | //a[contains(text(), 'Cancel')]");
-    private final SelenideElement editButton = $x("//button[@data-testid='edit-issue-title-button'] | //button[contains(text(), 'Edit')] | //a[contains(text(), 'Edit')]");
+    private final InputElement titleField = InputElement.byXpath("//input[@name='issue[title]'] | //input[contains(@placeholder, 'Title')] | //input[contains(@aria-label, 'Title')]");
+    private final TextareaElement descriptionField = TextareaElement.byXpath("//textarea[@name='issue[body]'] | //textarea[contains(@placeholder, 'comment')] | //textarea[contains(@aria-label, 'Comment')]");
+    private final ButtonElement saveButton = ButtonElement.byXpath("//button[contains(text(), 'Update issue')] | //button[contains(text(), 'Save')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
+    private final ButtonElement cancelButton = ButtonElement.byXpath("//button[contains(text(), 'Cancel')] | //a[contains(text(), 'Cancel')]");
+    private final ButtonElement editButton = ButtonElement.byXpath("//button[@data-testid='edit-issue-title-button'] | //button[contains(text(), 'Edit')] | //a[contains(text(), 'Edit')]");
 
     /**
      * Конструктор страницы редактирования issue
@@ -33,8 +30,7 @@ public class EditIssuePage extends BasePage {
      * @return текущая страница
      */
     public EditIssuePage clearTitle() {
-        log.info("Очистка поля заголовка");
-        titleField.shouldBe(visible).clear();
+        clearField(titleField, "заголовок issue");
         return this;
     }
     
@@ -44,8 +40,7 @@ public class EditIssuePage extends BasePage {
      * @return текущая страница
      */
     public EditIssuePage fillTitle(String title) {
-        log.info("Заполнение нового заголовка: {}", title);
-        titleField.shouldBe(visible).setValue(title);
+        fillField(titleField, title, "заголовок issue");
         return this;
     }
     
@@ -55,8 +50,7 @@ public class EditIssuePage extends BasePage {
      * @return текущая страница
      */
     public EditIssuePage fillDescription(String description) {
-        log.info("Заполнение нового описания");
-        descriptionField.shouldBe(visible).setValue(description);
+        fillTextarea(descriptionField, description, "описание issue");
         return this;
     }
     
@@ -65,7 +59,7 @@ public class EditIssuePage extends BasePage {
      * @return текущий заголовок
      */
     public String getCurrentTitle() {
-        return titleField.shouldBe(visible).getValue();
+        return titleField.getValue();
     }
     
     /**
@@ -73,7 +67,7 @@ public class EditIssuePage extends BasePage {
      * @return текущее описание
      */
     public String getCurrentDescription() {
-        return descriptionField.shouldBe(visible).getValue();
+        return descriptionField.getValue();
     }
     
     /**
@@ -82,7 +76,7 @@ public class EditIssuePage extends BasePage {
      */
     public IssueDetailsPage clickSave() {
         log.info("Нажатие кнопки 'Save'");
-        saveButton.shouldBe(visible).click();
+        saveButton.click();
         return new IssueDetailsPage();
     }
     
@@ -92,15 +86,13 @@ public class EditIssuePage extends BasePage {
      */
     public IssueDetailsPage clickCancel() {
         log.info("Нажатие кнопки 'Cancel'");
-        cancelButton.shouldBe(visible).click();
+        cancelButton.click();
         return new IssueDetailsPage();
     }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы редактирования issue");
-        titleField.shouldBe(visible);
-        descriptionField.shouldBe(visible);
-        saveButton.shouldBe(visible);
+        waitForElementsVisible(titleField, descriptionField, saveButton);
     }
 }

@@ -2,10 +2,12 @@ package ru.github.components;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BaseComponent;
+import ru.github.components.BaseComponent;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.ImageElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Компонент строки issue в списке
@@ -13,10 +15,10 @@ import static com.codeborne.selenide.Condition.*;
 public class IssueRowComponent extends BaseComponent {
     
     private final SelenideElement issueRow;
-    private final SelenideElement titleLink;
-    private final SelenideElement statusBadge;
+    private final ButtonElement titleLink;
+    private final TextElement statusBadge;
     private final ElementsCollection labels;
-    private final SelenideElement pinnedIndicator;
+    private final ImageElement pinnedIndicator;
     
     /**
      * Конструктор компонента строки issue
@@ -24,10 +26,10 @@ public class IssueRowComponent extends BaseComponent {
      */
     public IssueRowComponent(SelenideElement issueRow) {
         this.issueRow = issueRow;
-        this.titleLink = issueRow.$(".Link--primary");
-        this.statusBadge = issueRow.$(".State");
+        this.titleLink = new ButtonElement(issueRow.$(".Link--primary"));
+        this.statusBadge = new TextElement(issueRow.$(".State"));
         this.labels = issueRow.$$(".Label");
-        this.pinnedIndicator = issueRow.$(".octicon-pin");
+        this.pinnedIndicator = new ImageElement(issueRow.$(".octicon-pin"));
         
         log.info("Инициализация компонента строки issue");
     }
@@ -37,7 +39,7 @@ public class IssueRowComponent extends BaseComponent {
      * @return заголовок issue
      */
     public String getTitle() {
-        return titleLink.shouldBe(visible).getText();
+        return titleLink.getText();
     }
     
     /**
@@ -45,7 +47,7 @@ public class IssueRowComponent extends BaseComponent {
      * @return статус issue
      */
     public String getStatus() {
-        return statusBadge.shouldBe(visible).getText();
+        return statusBadge.getText();
     }
     
     /**
@@ -94,7 +96,7 @@ public class IssueRowComponent extends BaseComponent {
      */
     public void clickTitle() {
         log.info("Нажатие на заголовок issue: {}", getTitle());
-        titleLink.shouldBe(visible).click();
+        titleLink.click();
     }
     
     /**
@@ -102,7 +104,7 @@ public class IssueRowComponent extends BaseComponent {
      */
     public void click() {
         log.info("Нажатие на строку issue");
-        issueRow.shouldBe(visible).click();
+        issueRow.click();
     }
     
     /**

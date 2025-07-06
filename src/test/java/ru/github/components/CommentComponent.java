@@ -1,10 +1,11 @@
 package ru.github.components;
 
 import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BaseComponent;
+import ru.github.components.BaseComponent;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Компонент для работы с комментариями
@@ -12,10 +13,10 @@ import static com.codeborne.selenide.Condition.*;
 public class CommentComponent extends BaseComponent {
     
     private final SelenideElement commentElement;
-    private final SelenideElement authorLink;
-    private final SelenideElement commentText;
-    private final SelenideElement editButton;
-    private final SelenideElement deleteButton;
+    private final ButtonElement authorLink;
+    private final TextElement commentText;
+    private final ButtonElement editButton;
+    private final ButtonElement deleteButton;
 
     /**
      * Конструктор компонента комментария по тексту
@@ -23,10 +24,10 @@ public class CommentComponent extends BaseComponent {
      */
     public CommentComponent(String commentText) {
         this.commentElement = $x("//div[contains(@class, 'comment-body') and contains(text(), '" + commentText + "')]");
-        this.authorLink = commentElement.$(".author");
-        this.commentText = commentElement.$(".comment-body");
-        this.editButton = commentElement.$x(".//button[contains(text(), 'Edit')]");
-        this.deleteButton = commentElement.$x(".//button[contains(text(), 'Delete')]");
+        this.authorLink = new ButtonElement(commentElement.$(".author"));
+        this.commentText = new TextElement(commentElement.$(".comment-body"));
+        this.editButton = new ButtonElement(commentElement.$x(".//button[contains(text(), 'Edit')]"));
+        this.deleteButton = new ButtonElement(commentElement.$x(".//button[contains(text(), 'Delete')]"));
         
         log.info("Инициализация компонента комментария по тексту: {}", commentText);
     }
@@ -36,7 +37,7 @@ public class CommentComponent extends BaseComponent {
      * @return текст комментария
      */
     public String getCommentText() {
-        return commentText.shouldBe(visible).getText();
+        return commentText.getText();
     }
     
     /**
@@ -44,7 +45,7 @@ public class CommentComponent extends BaseComponent {
      * @return имя автора
      */
     public String getAuthor() {
-        return authorLink.shouldBe(visible).getText();
+        return authorLink.getText();
     }
     
     /**
@@ -61,7 +62,7 @@ public class CommentComponent extends BaseComponent {
      * @param expectedText ожидаемый текст
      * @return true, если текст содержится в комментарии
      */
-    public boolean containsText(String expectedText) {
+    public boolean isCommentTextContains(String expectedText) {
         return getCommentText().contains(expectedText);
     }
     
@@ -70,7 +71,7 @@ public class CommentComponent extends BaseComponent {
      */
     public void clickEdit() {
         log.info("Нажатие кнопки редактирования комментария");
-        editButton.shouldBe(visible).click();
+        editButton.click();
     }
     
     /**
@@ -78,7 +79,7 @@ public class CommentComponent extends BaseComponent {
      */
     public void clickDelete() {
         log.info("Нажатие кнопки удаления комментария");
-        deleteButton.shouldBe(visible).click();
+        deleteButton.click();
     }
     
     /**

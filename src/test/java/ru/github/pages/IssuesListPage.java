@@ -4,27 +4,25 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.github.base.BasePage;
-import ru.github.components.IssueRowComponent;
-import ru.github.pages.NewIssuePage;
 
-import java.time.Duration;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.InputElement;
+import ru.github.components.elements.TextElement;
+import ru.github.components.IssueRowComponent;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Страница со списком issues
  */
 public class IssuesListPage extends BasePage {
     
-    private static final String NEW_ISSUE_BUTTON_TEXT = "New issue";
     private static final String CLOSED_ISSUES_FILTER = "is:issue is:closed";
     
-    private final SelenideElement newIssueButton = $("a[data-variant='primary']");
-    private final SelenideElement searchField = $("#repository-input");
+    private final ButtonElement newIssueButton = ButtonElement.byCssSelector("a[data-variant='primary']");
+    private final InputElement searchField = InputElement.byId("repository-input");
     private final ElementsCollection issueRows = $$(".Box-row");
-    private final SelenideElement noIssuesMessage = $(".blankslate");
+    private final TextElement noIssuesMessage = TextElement.byCssSelector(".blankslate");
     
     /**
      * Конструктор страницы списка issues
@@ -44,10 +42,10 @@ public class IssuesListPage extends BasePage {
         // Запоминаем количество окон до клика
         int initialWindowCount = WebDriverRunner.getWebDriver().getWindowHandles().size();
         
-        newIssueButton.shouldBe(visible).click();
+        newIssueButton.click();
         
         // Ждем появления нового окна с WebDriverWait
-        WebDriverWait wait = new WebDriverWait(WebDriverRunner.getWebDriver(), Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(WebDriverRunner.getWebDriver(), java.time.Duration.ofSeconds(10));
         boolean newWindowOpened = false;
         
         try {
@@ -80,8 +78,8 @@ public class IssuesListPage extends BasePage {
      */
     public IssueDetailsPage clickIssueByTitle(String issueTitle) {
         log.info("Переход к issue с заголовком: {}", issueTitle);
-        SelenideElement issueLink = $x("//a[contains(@class, 'Link--primary') and contains(text(), '" + issueTitle + "')]");
-        issueLink.shouldBe(visible).click();
+        ButtonElement issueLink = ButtonElement.byXpath("//a[contains(@class, 'Link--primary') and contains(text(), '" + issueTitle + "')]");
+        issueLink.click();
         return new IssueDetailsPage();
     }
     
@@ -102,8 +100,7 @@ public class IssuesListPage extends BasePage {
      * @return текущая страница с результатами поиска
      */
     public IssuesListPage searchIssues(String searchQuery) {
-        log.info("Поиск issues по запросу: {}", searchQuery);
-        searchField.shouldBe(visible).setValue(searchQuery).pressEnter();
+        performSearch(searchField, searchQuery, "issues");
         return this;
     }
     
@@ -121,9 +118,9 @@ public class IssuesListPage extends BasePage {
      * @param issueTitle заголовок issue
      * @return true, если issue существует
      */
-    public boolean isIssueExists(String issueTitle) {
+    public boolean isIssueWithTitleExists(String issueTitle) {
         log.info("Проверка существования issue с заголовком: {}", issueTitle);
-        SelenideElement issueLink = $x("//a[@data-testid='issue-pr-title-link' and .//span[text()='" + issueTitle + "']]");
+        TextElement issueLink = TextElement.byXpath("//a[@data-testid='issue-pr-title-link' and .//span[text()='" + issueTitle + "']]");
         boolean exists = issueLink.exists();
         log.info("Issue '{}' существует: {}", issueTitle, exists);
         return exists;
@@ -134,7 +131,7 @@ public class IssuesListPage extends BasePage {
      * @return количество issues
      */
     public int getIssuesCount() {
-        if (noIssuesMessage.isDisplayed()) {
+        if (noIssuesMessage.isVisible()) {
             return 0;
         }
         return issueRows.size();
@@ -143,6 +140,6 @@ public class IssuesListPage extends BasePage {
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы списка issues");
-        newIssueButton.shouldBe(visible);
+        newIssueButton.waitForVisible();
     }
 }

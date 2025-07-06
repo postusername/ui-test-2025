@@ -1,7 +1,7 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.base.BaseTest;
+import ru.github.tests.BaseTest;
 import ru.github.pages.*;
 import ru.github.utils.ConfigReader;
 
@@ -15,28 +15,19 @@ public class PermissionsTest extends BaseTest {
     private static final String ISSUE_TITLE = ConfigReader.getTestData("issue.test.title");
     private static final String ISSUE_DESCRIPTION = ConfigReader.getTestData("issue.test.description");
 
+    /**
+     * Тест выполнения действий без необходимых прав
+     * Проверяет ограничения доступа к функциям управления issue
+     */
     @Test
     public void testActionWithoutPermissions() {
-        RepositoryPage repositoryPage = authService.auth()
-                .navigateToTestRepository();
-        
-        IssuesListPage issuesPage = repositoryPage.clickIssuesTab();
-        NewIssuePage newIssuePage = issuesPage.clickNewIssue();
-        IssueDetailsPage issueDetailsPage = newIssuePage
-                .fillTitle(ISSUE_TITLE)
-                .fillDescription(ISSUE_DESCRIPTION)
-                .clickCreate();
-
-        assertTrue(issueDetailsPage.isOpen(), "Issue должна быть открыта");
+        IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
+        assertTrue(issueDetailsPage.isIssueStatusOpen(), "Issue должна быть открыта");
         assertEquals(ISSUE_TITLE, issueDetailsPage.getTitle(), "Заголовок должен совпадать");
 
         try {
-            var issueActions = issueDetailsPage.getIssueActions();
-            
-            log.info("Проверка доступности функций управления issue");
-            
+            var issueActions = issueDetailsPage.getIssueActions();     
             log.info("Пользователь имеет права на создание issue");
-            
         } catch (Exception e) {
             log.info("Обнаружены ограничения прав доступа: {}", e.getMessage());
         }

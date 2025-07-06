@@ -1,10 +1,9 @@
 package ru.github.pages;
 
-import com.codeborne.selenide.SelenideElement;
-import ru.github.base.BasePage;
+import ru.github.components.elements.ButtonElement;
+import ru.github.components.elements.TextElement;
 
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
 
 /**
  * Страница репозитория GitHub
@@ -13,9 +12,9 @@ public class RepositoryPage extends BasePage {
     
     private static final String ISSUES_TAB_TEXT = "Issues";
     
-    private final SelenideElement issuesTab = $("#issues-tab");
-    private final SelenideElement repositoryName = $("[data-pjax='#js-repo-pjax-container'] h1");
-    private final SelenideElement codeTab = $("#code-tab");
+    private final ButtonElement issuesTab = ButtonElement.byId("issues-tab");
+    private final TextElement repositoryName = TextElement.byCssSelector("[data-pjax='#js-repo-pjax-container'] h1");
+    private final ButtonElement codeTab = ButtonElement.byId("code-tab");
     
     /**
      * Конструктор страницы репозитория
@@ -31,7 +30,7 @@ public class RepositoryPage extends BasePage {
      */
     public IssuesListPage navigateToIssues() {
         log.info("Переход на вкладку 'Issues'");
-        issuesTab.shouldBe(visible).click();
+        issuesTab.click();
         return new IssuesListPage();
     }
     
@@ -49,7 +48,7 @@ public class RepositoryPage extends BasePage {
      */
     public RepositoryPage navigateToCode() {
         log.info("Переход на вкладку 'Code'");
-        codeTab.shouldBe(visible).click();
+        codeTab.click();
         return this;
     }
     
@@ -58,7 +57,7 @@ public class RepositoryPage extends BasePage {
      * @return имя репозитория
      */
     public String getRepositoryName() {
-        return repositoryName.shouldBe(visible).getText();
+        return repositoryName.getText();
     }
     
     /**
@@ -72,7 +71,6 @@ public class RepositoryPage extends BasePage {
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы репозитория");
-        issuesTab.shouldBe(visible);
-        codeTab.shouldBe(visible);
+        waitForElementsVisible(issuesTab, codeTab);
     }
 }

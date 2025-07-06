@@ -1,7 +1,7 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.base.BaseTest;
+import ru.github.tests.BaseTest;
 import ru.github.pages.*;
 import ru.github.utils.ConfigReader;
 
@@ -15,60 +15,44 @@ public class IssueManagementTest extends BaseTest {
     private static final String ISSUE_TITLE = ConfigReader.getTestData("issue.test.title");
     private static final String ISSUE_DESCRIPTION = ConfigReader.getTestData("issue.test.description");
 
+    /**
+     * Тест закрытия issue
+     * Проверяет возможность изменения статуса issue с "открыта" на "закрыта"
+     */
     @Test
     public void testCloseIssue() {
-        RepositoryPage repositoryPage = authService.auth()
-                .navigateToTestRepository();
-        
-        IssuesListPage issuesPage = repositoryPage.clickIssuesTab();
-        NewIssuePage newIssuePage = issuesPage.clickNewIssue();
-        IssueDetailsPage issueDetailsPage = newIssuePage
-                .fillTitle(ISSUE_TITLE)
-                .fillDescription(ISSUE_DESCRIPTION)
-                .clickCreate();
-
-        assertTrue(issueDetailsPage.isOpen(), "Issue должна быть открыта");
+        IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
+        assertTrue(issueDetailsPage.isIssueStatusOpen(), "Issue должна быть открыта");
 
         log.info("Текущий статус до закрытия: {}", issueDetailsPage.getStatus());
         issueDetailsPage.clickClose();
-
         String finalStatus = issueDetailsPage.getStatus();
         log.info("Статус после попытки закрытия: {}", finalStatus);
-        
-        assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
+        assertTrue(issueDetailsPage.isIssueStatusClosed(), "Issue должна быть закрыта");
     }
 
+    /**
+     * Тест переоткрытия закрытой issue
+     * Проверяет возможность возврата статуса issue с "закрыта" на "открыта"
+     */
     @Test
     public void testReopenClosedIssue() {
-        RepositoryPage repositoryPage = authService.auth()
-                .navigateToTestRepository();
-        
-        IssuesListPage issuesPage = repositoryPage.clickIssuesTab();
-        NewIssuePage newIssuePage = issuesPage.clickNewIssue();
-        IssueDetailsPage issueDetailsPage = newIssuePage
-                .fillTitle(ISSUE_TITLE)
-                .fillDescription(ISSUE_DESCRIPTION)
-                .clickCreate();
+        IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
 
         issueDetailsPage.clickClose();
-        assertTrue(issueDetailsPage.isClosed(), "Issue должна быть закрыта");
+        assertTrue(issueDetailsPage.isIssueStatusClosed(), "Issue должна быть закрыта");
         
         issueDetailsPage.clickReopen();
-        assertTrue(issueDetailsPage.isOpen(), "Issue должна быть переоткрыта");
+        assertTrue(issueDetailsPage.isIssueStatusOpen(), "Issue должна быть переоткрыта");
     }
 
+    /**
+     * Тест закрепления issue
+     * Проверяет возможность закрепления issue для выделения её в списке
+     */
     @Test
     public void testPinIssue() {
-        RepositoryPage repositoryPage = authService.auth()
-                .navigateToTestRepository();
-        
-        IssuesListPage issuesPage = repositoryPage.clickIssuesTab();
-        NewIssuePage newIssuePage = issuesPage.clickNewIssue();
-        IssueDetailsPage issueDetailsPage = newIssuePage
-                .fillTitle(ISSUE_TITLE)
-                .fillDescription(ISSUE_DESCRIPTION)
-                .clickCreate();
-
+        IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
         issueDetailsPage.clickPin();
         log.info("Issue успешно закреплена");
     }
