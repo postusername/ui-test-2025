@@ -176,10 +176,10 @@ public class IssueActionsComponent extends BaseComponent {
     public void selectLabel(String labelName) {
         log.info("Выбор метки: {}", labelName);
         clickLabels();
-        
-        //sleep(10000);
+
         try {
-            SelenideElement labelOption = $x("//div[contains(text(), '" + labelName + "')]");
+            ButtonElement labelOption = ButtonElement.byXpath("//span[@data-component='ActionList.Item--DividerContainer'][contains(., '" + labelName + "')]");
+            labelOption.waitForVisible();
             if (labelOption.exists()) {
                 labelOption.click();
                 log.info("Метка {} выбрана", labelName);
@@ -189,6 +189,9 @@ public class IssueActionsComponent extends BaseComponent {
         } catch (Exception e) {
             log.error("Ошибка при выборе метки: {}", e.getMessage());
         }
+
+        clickLabels();
+        issueLabelsContainer.waitForVisible();
     }
     
     /**

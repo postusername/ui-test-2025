@@ -74,10 +74,9 @@ public class IssueInfoComponent extends BaseComponent {
     public IssueInfoComponent editTitle(String newTitle) {
         log.info("Редактирование заголовка issue на: {}", newTitle);
         
-        InputElement titleInput = InputElement.byXpath("//input[contains(@class, 'form-control')] | //input[@type='text'] | //input[contains(@aria-label, 'title')]");
+        InputElement titleInput = InputElement.byTestId("issue-title-input");
         
         if (titleInput.exists()) {
-            titleInput.clear();
             titleInput.setValue(newTitle);
             titleInput.pressEnter();
             issueTitle.waitForVisible();

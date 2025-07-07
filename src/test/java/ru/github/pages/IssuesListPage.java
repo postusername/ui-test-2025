@@ -12,6 +12,8 @@ import ru.github.components.IssueRowComponent;
 
 import static com.codeborne.selenide.Selenide.*;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * Страница со списком issues
  */
@@ -78,7 +80,7 @@ public class IssuesListPage extends BasePage {
      */
     public IssueDetailsPage clickIssueByTitle(String issueTitle) {
         log.info("Переход к issue с заголовком: {}", issueTitle);
-        ButtonElement issueLink = ButtonElement.byXpath("//a[contains(@class, 'Link--primary') and contains(text(), '" + issueTitle + "')]");
+        ButtonElement issueLink = ButtonElement.byXpath("//a[contains(@class, 'IssuePullRequestTitle') and contains(., '" + issueTitle + "')]");
         issueLink.click();
         return new IssueDetailsPage();
     }
@@ -90,7 +92,7 @@ public class IssuesListPage extends BasePage {
      */
     public IssueRowComponent getIssueRowByTitle(String issueTitle) {
         log.info("Получение строки issue с заголовком: {}", issueTitle);
-        SelenideElement issueRow = $x("//div[contains(@class, 'Box-row') and .//a[contains(text(), '" + issueTitle + "')]]");
+        SelenideElement issueRow = $x("//div[contains(@class, 'ListItem-module') and .//a[contains(., '" + issueTitle + "')]]");
         return new IssueRowComponent(issueRow);
     }
     
@@ -120,7 +122,8 @@ public class IssuesListPage extends BasePage {
      */
     public boolean isIssueWithTitleExists(String issueTitle) {
         log.info("Проверка существования issue с заголовком: {}", issueTitle);
-        TextElement issueLink = TextElement.byXpath("//a[@data-testid='issue-pr-title-link' and .//span[text()='" + issueTitle + "']]");
+        ButtonElement issueLink = ButtonElement.byXpath("//a[contains(@class, 'IssuePullRequestTitle') and contains(., '" + issueTitle + "')]");
+        issueLink.waitForVisible();
         boolean exists = issueLink.exists();
         log.info("Issue '{}' существует: {}", issueTitle, exists);
         return exists;
@@ -141,5 +144,14 @@ public class IssuesListPage extends BasePage {
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы списка issues");
         newIssueButton.waitForVisible();
+    }
+
+    public boolean isIssueWithTitlePinned(String issueTitle) {
+        log.info("Проверка закрепления issue с заголовком: {}", issueTitle);
+        ButtonElement issueLink = ButtonElement.byXpath("//li[contains(@class, 'PinnedIssues') and contains(., '" + issueTitle + "')]");
+        issueLink.waitForVisible();
+        boolean exists = issueLink.exists();
+        log.info("Issue '{}' закреплен: {}", issueTitle, exists);
+        return exists;
     }
 }

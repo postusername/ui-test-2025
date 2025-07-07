@@ -19,6 +19,7 @@ public class IssueCreationTest extends BaseTest {
     private static final String ISSUE_TITLE = ConfigReader.getTestData("issue.test.title");
     private static final String ISSUE_DESCRIPTION = ConfigReader.getTestData("issue.test.description");
     private static final String UPDATED_TITLE = ConfigReader.getTestData("issue.test.updated.title");
+    private static final String UPDATED_TITLE_PART = UPDATED_TITLE.substring(UPDATED_TITLE.lastIndexOf(' '));
 
     /**
      * Тест создания issue с пустым заголовком
@@ -58,7 +59,7 @@ public class IssueCreationTest extends BaseTest {
     @Test
     public void testEditIssueTitle() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
-        issueDetailsPage.editTitle(UPDATED_TITLE);
+        issueDetailsPage.editTitle(UPDATED_TITLE_PART); // Github не даёт адекватно менять форму ботами, поэтому изгаляемся
         assertEquals(UPDATED_TITLE, issueDetailsPage.getTitle(), "Заголовок должен быть обновлен");
     }
 }

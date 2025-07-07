@@ -14,7 +14,6 @@ public class IssueAssignmentTest extends BaseTest {
 
     private static final String ISSUE_TITLE = ConfigReader.getTestData("issue.test.title");
     private static final String ISSUE_DESCRIPTION = ConfigReader.getTestData("issue.test.description");
-    private static final String ASSIGNEE_USERNAME = ConfigReader.getTestData("issue.test.assignee");
     private static final String LABEL_NAME = ConfigReader.getTestData("issue.test.label");
     private static final String NONEXISTENT_LABEL = ConfigReader.getTestData("issue.test.nonexistent.label");
 

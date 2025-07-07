@@ -1,8 +1,9 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.tests.BaseTest;
-import ru.github.pages.*;
+import ru.github.pages.IssueDetailsPage;
+import ru.github.pages.IssuesListPage;
+import ru.github.pages.MainPage;
 import ru.github.utils.ConfigReader;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +55,10 @@ public class IssueManagementTest extends BaseTest {
     public void testPinIssue() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
         issueDetailsPage.clickPin();
-        log.info("Issue успешно закреплена");
+        MainPage mainPage = authService.getMainPage();
+        IssuesListPage issuesListPage = mainPage
+                .navigateToTestRepository()
+                .clickIssuesTab();
+        assertTrue(issuesListPage.isIssueWithTitlePinned(ISSUE_TITLE), "Issue должен быть закреплен");
     }
 }

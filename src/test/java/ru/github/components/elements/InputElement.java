@@ -45,6 +45,10 @@ public class InputElement extends BaseElement {
         return new InputElement($("#" + id));
     }
     
+    public static InputElement byTestId(String testId) {
+        return new InputElement($("[data-testid='" + testId + "']"));
+    }
+
     /**
      * Создает элемент input по имени
      * @param name значение атрибута name
@@ -110,10 +114,7 @@ public class InputElement extends BaseElement {
      * @return текущий элемент
      */
     public InputElement clear() {
-        log.info("Очищаю input");
-        waitForVisible();
-        element.clear();
-        return this;
+        return setValue("");
     }
     
     /**
