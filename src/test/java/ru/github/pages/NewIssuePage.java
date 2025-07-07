@@ -5,7 +5,6 @@ import ru.github.components.elements.InputElement;
 import ru.github.components.elements.TextElement;
 import ru.github.components.elements.TextareaElement;
 
-import static com.codeborne.selenide.Selenide.*;
 
 /**
  * Страница создания новой issue
@@ -47,56 +46,23 @@ public class NewIssuePage extends BasePage {
     }
     
     /**
-     * Очищает поле заголовка
-     * @return текущая страница
-     */
-    public NewIssuePage clearTitle() {
-        clearField(titleField, "заголовок issue");
-        return this;
-    }
-    
-    /**
      * Нажимает кнопку создания issue
      * @return страница деталей созданной issue
      */
-    public IssueDetailsPage clickSubmit() {
+    public IssueDetailsPage clickCreate() {
         log.info("Нажатие кнопки 'Create'");
         submitButton.click();
         return new IssueDetailsPage();
     }
-    
-    /**
-     * Нажимает кнопку создания issue (альтернативное название для совместимости)
-     * @return страница деталей созданной issue
-     */
-    public IssueDetailsPage clickCreate() {
-        return clickSubmit();
-    }
-    
+
     /**
      * Пытается создать issue с пустым заголовком
      * @return текущая страница с ошибкой
      */
-    public NewIssuePage clickSubmitWithEmptyTitle() {
+    public NewIssuePage clickCreateWithoutTitle() {
         log.info("Попытка создания issue с пустым заголовком");
         submitButton.click();
         return this;
-    }
-    
-    /**
-     * Пытается создать issue без заголовка (альтернативное название для совместимости)
-     * @return текущая страница с ошибкой
-     */
-    public NewIssuePage clickCreateWithoutTitle() {
-        return clickSubmitWithEmptyTitle();
-    }
-    
-    /**
-     * Получает текст ошибки
-     * @return текст ошибки
-     */
-    public String getErrorMessage() {
-        return getErrorText(titleError);
     }
     
     /**
@@ -105,14 +71,6 @@ public class NewIssuePage extends BasePage {
      */
     public boolean isEmptyTitleErrorDisplayed() {
         return hasErrorWithText(titleError, TITLE_EMPTY_ERROR);
-    }
-    
-    /**
-     * Проверяет наличие ошибки валидации (альтернативное название для совместимости)
-     * @return true, если есть ошибка валидации
-     */
-    public boolean isErrorDisplayed() {
-        return hasError(titleError);
     }
     
     @Override

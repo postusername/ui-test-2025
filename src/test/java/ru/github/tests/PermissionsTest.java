@@ -27,7 +27,7 @@ public class PermissionsTest extends BaseTest {
         assertEquals(ISSUE_TITLE, issueDetailsPage.getTitle(), "Заголовок должен совпадать");
         
         // Получаем URL текущей issue для последующего перехода
-        String issueUrl = getCurrentUrl();
+        String issueUrl = issueDetailsPage.getCurrentUrl();
         log.info("URL созданной issue: {}", issueUrl);
         
         // Выходим из системы
@@ -56,14 +56,6 @@ public class PermissionsTest extends BaseTest {
                 "Должны быть ограничения прав доступа для второго пользователя");
         
         log.info("Тест пройден: обнаружены ограничения прав доступа для второго пользователя");
-    }
-
-    /**
-     * Получает текущий URL страницы
-     * @return текущий URL
-     */
-    private String getCurrentUrl() {
-        return com.codeborne.selenide.WebDriverRunner.getWebDriver().getCurrentUrl();
     }
     
     /**

@@ -1,6 +1,5 @@
 package ru.github.pages;
 
-import com.codeborne.selenide.WebDriverRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +8,6 @@ import ru.github.components.elements.InputElement;
 import ru.github.components.elements.TextareaElement;
 import ru.github.components.elements.TextElement;
 
-import static com.codeborne.selenide.Selenide.title;
 import static com.codeborne.selenide.WebDriverRunner.url;
 
 /**
@@ -32,23 +30,6 @@ public abstract class BasePage {
      */
     public String getCurrentUrl() {
         return url();
-    }
-    
-    /**
-     * Получает заголовок страницы
-     * @return заголовок страницы
-     */
-    public String getPageTitle() {
-        return title();
-    }
-    
-    /**
-     * Проверяет, что URL содержит указанную строку
-     * @param expectedUrlPart ожидаемая часть URL
-     * @return true, если URL содержит указанную строку
-     */
-    public boolean isUrlContains(String expectedUrlPart) {
-        return getCurrentUrl().contains(expectedUrlPart);
     }
     
     /**
@@ -92,28 +73,6 @@ public abstract class BasePage {
     }
     
     /**
-     * Очищает поле ввода с логированием
-     * @param field поле ввода
-     * @param fieldName название поля для логирования
-     */
-    protected void clearField(InputElement field, String fieldName) {
-        log.info("Очистка поля '{}'", fieldName);
-        field.clear();
-    }
-    
-    /**
-     * Выполняет поиск через поле ввода
-     * @param searchField поле поиска
-     * @param searchQuery поисковый запрос
-     * @param searchType тип поиска для логирования
-     */
-    protected void performSearch(InputElement searchField, String searchQuery, String searchType) {
-        log.info("Поиск {}: {}", searchType, searchQuery);
-        searchField.setValue(searchQuery);
-        searchField.pressEnter();
-    }
-    
-    /**
      * Проверяет наличие ошибки в текстовом элементе
      * @param errorElement элемент с ошибкой
      * @return true, если ошибка отображается
@@ -130,14 +89,5 @@ public abstract class BasePage {
      */
     protected boolean hasErrorWithText(TextElement errorElement, String expectedErrorText) {
         return hasError(errorElement) && errorElement.getText().contains(expectedErrorText);
-    }
-    
-    /**
-     * Получает текст ошибки
-     * @param errorElement элемент с ошибкой
-     * @return текст ошибки или пустую строку
-     */
-    protected String getErrorText(TextElement errorElement) {
-        return hasError(errorElement) ? errorElement.getText() : "";
     }
 }

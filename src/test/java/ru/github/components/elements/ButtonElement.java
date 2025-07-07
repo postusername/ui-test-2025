@@ -18,6 +18,17 @@ public class ButtonElement extends BaseElement {
     }
     
     /**
+     * Кликает по кнопке с предварительной проверкой видимости
+     * @return текущий элемент
+     */
+    public ButtonElement click() {
+        log.info("Кликаю по кнопке");
+        waitForVisible();
+        element.click();
+        return this;
+    }
+    
+    /**
      * Создает элемент кнопки по XPath
      * @param xpath выражение XPath
      * @return ButtonElement
@@ -45,41 +56,11 @@ public class ButtonElement extends BaseElement {
     }
     
     /**
-     * Создает элемент кнопки по тексту
-     * @param text текст кнопки
-     * @return ButtonElement
-     */
-    public static ButtonElement byText(String text) {
-        return new ButtonElement($(com.codeborne.selenide.Selectors.byText(text)));
-    }
-    
-    /**
      * Создает элемент кнопки по data-testid
      * @param testId значение атрибута data-testid
      * @return ButtonElement
      */
     public static ButtonElement byTestId(String testId) {
         return new ButtonElement($("[data-testid='" + testId + "']"));
-    }
-    
-    /**
-     * Кликает по кнопке с предварительной проверкой видимости
-     * @return текущий элемент
-     */
-    public ButtonElement click() {
-        log.info("Кликаю по кнопке");
-        waitForVisible();
-        element.click();
-        return this;
-    }
-    
-    /**
-     * Кликает по кнопке без проверки видимости
-     * @return текущий элемент
-     */
-    public ButtonElement forceClick() {
-        log.info("Принудительный клик по кнопке");
-        element.click();
-        return this;
     }
 } 

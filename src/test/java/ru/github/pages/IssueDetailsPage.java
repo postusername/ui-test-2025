@@ -2,14 +2,10 @@ package ru.github.pages;
 
 import ru.github.components.elements.TextElement;
 
-import java.util.function.BooleanSupplier;
-
-import ru.github.components.CommentComponent;
 import ru.github.components.CommentFormComponent;
 import ru.github.components.IssueActionsComponent;
 import ru.github.components.IssueControlsComponent;
 import ru.github.components.IssueInfoComponent;
-import ru.github.pages.BasePage;
 
 /**
  * Страница деталей issue
@@ -36,14 +32,6 @@ public class IssueDetailsPage extends BasePage {
      */
     public String getTitle() {
         return issueInfo.getTitle();
-    }
-    
-    /**
-     * Получает описание issue
-     * @return описание issue
-     */
-    public String getDescription() {
-        return issueInfo.getDescription();
     }
     
     /**
@@ -85,7 +73,6 @@ public class IssueDetailsPage extends BasePage {
      * @return текущая страница
      */
     public IssueDetailsPage editTitle(String newTitle) {
-        clickEdit();
         issueInfo.editTitle(newTitle);
         return this;
     }
@@ -177,15 +164,6 @@ public class IssueDetailsPage extends BasePage {
     }
     
     /**
-     * Получает комментарий по тексту
-     * @param commentText текст комментария
-     * @return компонент комментария
-     */
-    public CommentComponent getCommentByText(String commentText) {
-        return new CommentComponent(commentText);
-    }
-    
-    /**
      * Проверяет, что обсуждение заблокировано
      * @return true, если обсуждение заблокировано
      */
@@ -208,14 +186,19 @@ public class IssueDetailsPage extends BasePage {
     public String getNoPermissionTooltip() {
         return permissionsTooltip.exists() ? permissionsTooltip.getAttribute("aria-label") : "";
     }
+
+    /**
+     * Проверяет, что комментарий с текстом существует
+     * @param commentText текст комментария
+     * @return true, если комментарий существует
+     */
+    public boolean isCommentWithTextExists(String commentText) {
+        return commentForm.isCommentWithTextExists(commentText);
+    }
     
     @Override
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы деталей issue");
         issueInfo.waitForLoad();
-    }
-
-    public boolean isCommentWithTextExists(String commentText) {
-        return commentForm.isCommentWithTextExists(commentText);
     }
 }

@@ -4,7 +4,7 @@ import ru.github.utils.ConfigReader;
 import ru.github.components.elements.InputElement;
 import ru.github.components.elements.ButtonElement;
 
-import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.open;
 
 /**
  * Страница авторизации GitHub

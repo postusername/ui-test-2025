@@ -12,9 +12,8 @@ public class IssueInfoComponent extends BaseComponent {
     private static final String CLOSED_STATUS = "Closed";
     
     private final TextElement issueTitle = TextElement.byTestId("issue-title");
-    private final TextElement issueTitleSticky = TextElement.byTestId("issue-title-sticky");
-    private final TextElement issueDescription = TextElement.byTestId("markdown-body");
     private final TextElement statusBadge = TextElement.byTestId("header-state");
+    private final InputElement titleInput = InputElement.byTestId("issue-title-input");
     
     /**
      * Конструктор компонента информации о issue
@@ -28,18 +27,7 @@ public class IssueInfoComponent extends BaseComponent {
      * @return заголовок issue
      */
     public String getTitle() {
-        if (issueTitle.exists()) {
-            return issueTitle.getTextWithWait();
-        }
-        return issueTitleSticky.getTextWithWait();
-    }
-    
-    /**
-     * Получает описание issue
-     * @return описание issue
-     */
-    public String getDescription() {
-        return issueDescription.getTextWithWait();
+        return issueTitle.getTextWithWait();
     }
     
     /**
@@ -73,9 +61,6 @@ public class IssueInfoComponent extends BaseComponent {
      */
     public IssueInfoComponent editTitle(String newTitle) {
         log.info("Редактирование заголовка issue на: {}", newTitle);
-        
-        InputElement titleInput = InputElement.byTestId("issue-title-input");
-        
         if (titleInput.exists()) {
             titleInput.setValue(newTitle);
             titleInput.pressEnter();

@@ -4,13 +4,13 @@ import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Condition.*;
 
 /**
  * Базовый класс для всех UI компонентов
  */
 public abstract class BaseComponent {
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -28,13 +28,5 @@ public abstract class BaseComponent {
      */
     protected void waitForVisible(SelenideElement element) {
         element.shouldBe(visible);
-    }
-    
-    /**
-     * Ожидает исчезновения элемента
-     * @param element элемент для ожидания
-     */
-    protected void waitForNotVisible(SelenideElement element) {
-        element.shouldNotBe(visible);
     }
 }

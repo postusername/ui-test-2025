@@ -1,7 +1,6 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.tests.BaseTest;
 import ru.github.pages.*;
 import ru.github.utils.ConfigReader;
 

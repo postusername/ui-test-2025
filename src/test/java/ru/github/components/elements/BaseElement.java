@@ -31,27 +31,19 @@ public abstract class BaseElement {
             log.warn("Ошибка при проверке существования элемента: {}", e.getMessage());
             return false;
         }
-    }
+    }   
     
     /**
      * Проверяет видимость элемента
      * @return true, если элемент видим
      */
-    public boolean isVisible() {
+    public boolean isDisplayed() {
         try {
             return element.isDisplayed();
         } catch (Exception e) {
             log.warn("Ошибка при проверке видимости элемента: {}", e.getMessage());
             return false;
         }
-    }
-    
-    /**
-     * Проверяет отображение элемента (алиас для isVisible)
-     * @return true, если элемент отображается
-     */
-    public boolean isDisplayed() {
-        return isVisible();
     }
     
     /**
@@ -103,19 +95,6 @@ public abstract class BaseElement {
             element.should(com.codeborne.selenide.Condition.visible);
         } catch (Exception e) {
             log.warn("Ошибка при ожидании видимости элемента: {}", e.getMessage());
-        }
-        return this;
-    }
-    
-    /**
-     * Ожидает исчезновения элемента
-     * @return текущий элемент
-     */
-    public BaseElement waitForNotVisible() {
-        try {
-            element.should(com.codeborne.selenide.Condition.not(com.codeborne.selenide.Condition.visible));
-        } catch (Exception e) {
-            log.warn("Ошибка при ожидании исчезновения элемента: {}", e.getMessage());
         }
         return this;
     }

@@ -1,34 +1,23 @@
 package ru.github.components;
 
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-import ru.github.components.BaseComponent;
 import ru.github.components.elements.ButtonElement;
 import ru.github.components.elements.InputElement;
 import ru.github.components.elements.TextElement;
-
-import static com.codeborne.selenide.Selenide.*;
 
 /**
  * Компонент боковой панели управления issue (Assignees, Labels)
  */
 public class IssueActionsComponent extends BaseComponent {
     
-    private final TextElement assigneesSection = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']");
     private final TextElement labelsSection = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Labels']");
-    
-    private final ButtonElement editAssigneesButton = ButtonElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//button[contains(@aria-describedby, 'loading-announcement')]");
     private final ButtonElement editLabelsButton = ButtonElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Labels']/..//button[contains(@aria-describedby, 'loading-announcement')]");
-    
     private final TextElement issueLabelsContainer = TextElement.byCssSelector("[data-testid='issue-labels']");
-    private final TextElement assigneesContainer = TextElement.byTestId("issue-assignees");
-    
     private final InputElement labelSearchField = InputElement.byCssSelector("input[placeholder*='filter' i], input[placeholder*='search' i]");
-    private final InputElement assigneeSearchField = InputElement.byCssSelector("input[placeholder*='search' i], input[placeholder*='type' i]");
-    
     private final TextElement searchResults = TextElement.byCssSelector(".ActionList, .prc-ActionList-ActionList-X4RiC");
     private final TextElement noResultsMessage = TextElement.byXpath("//div[contains(text(), 'No results') or contains(text(), 'not found')]");
-    
+
+    private final TextElement assigneesSection = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']");
+    private final TextElement assigneesContainer = TextElement.byTestId("issue-assignees");
     private final ButtonElement assignYourselfOption = ButtonElement.byXpath("//button[.//*[text()='Assign yourself']]");
 
     /**
@@ -52,22 +41,6 @@ public class IssueActionsComponent extends BaseComponent {
      */
     public boolean isLabelsVisible() {
         return labelsSection.exists();
-    }
-    
-    /**
-     * Кликает по кнопке редактирования назначений
-     */
-    public void clickAssignees() {
-        log.info("Клик по кнопке редактирования назначений");
-        try {
-            if (editAssigneesButton.exists()) {
-                editAssigneesButton.click();
-            } else {
-                log.warn("Кнопка редактирования назначений не найдена");
-            }
-        } catch (Exception e) {
-            log.error("Ошибка при клике по кнопке назначений: {}", e.getMessage());
-        }
     }
     
     /**
@@ -106,29 +79,17 @@ public class IssueActionsComponent extends BaseComponent {
     }
     
     /**
-     * Проверяет, что указанная метка найдена
-     * @param labelName название метки
-     * @return true, если метка найдена
-     */
-    public boolean isLabelFound(String labelName) {
-        try {
-            return $x("//div[contains(text(), '" + labelName + "')]").exists();
-        } catch (Exception e) {
-            log.error("Ошибка при проверке метки: {}", e.getMessage());
-            return false;
-        }
-    }
-    
-    /**
      * Проверяет, что предложение создать новую метку отображается
      * @param labelName название метки
      * @return true, если предложение создать метку отображается
      */
     public boolean isCreateLabelSuggestionVisible(String labelName) {
         try {
-            return $x("//div[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists() ||
-                   $x("//button[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists() ||
-                   $x("//span[contains(text(), 'Create') and contains(text(), '" + labelName + "')]").exists();
+            TextElement createLabelDiv = TextElement.byXpath("//div[contains(text(), 'Create') and contains(text(), '" + labelName + "')]");
+            ButtonElement createLabelButton = ButtonElement.byXpath("//button[contains(text(), 'Create') and contains(text(), '" + labelName + "')]");
+            TextElement createLabelSpan = TextElement.byXpath("//span[contains(text(), 'Create') and contains(text(), '" + labelName + "')]");
+            
+            return createLabelDiv.exists() || createLabelButton.exists() || createLabelSpan.exists();
         } catch (Exception e) {
             log.error("Ошибка при проверке предложения создать метку: {}", e.getMessage());
             return false;
@@ -145,27 +106,6 @@ public class IssueActionsComponent extends BaseComponent {
         } catch (Exception e) {
             log.error("Ошибка при проверке результатов поиска: {}", e.getMessage());
             return false;
-        }
-    }
-    
-    /**
-     * Выбирает исполнителя для issue
-     * @param username имя пользователя для назначения
-     */
-    public void selectAssignee(String username) {
-        log.info("Выбор исполнителя: {}", username);
-        clickAssignees();
-        
-        try {
-            SelenideElement userOption = $x("//div[contains(text(), '" + username + "')]");
-            if (userOption.exists()) {
-                userOption.click();
-                log.info("Исполнитель {} выбран", username);
-            } else {
-                log.warn("Не удалось найти исполнителя: {}", username);
-            }
-        } catch (Exception e) {
-            log.error("Ошибка при выборе исполнителя: {}", e.getMessage());
         }
     }
     
@@ -201,8 +141,8 @@ public class IssueActionsComponent extends BaseComponent {
      */
     public boolean isLabelSelected(String labelName) {
         try {
-            return issueLabelsContainer.exists() && 
-                   $x("//div[@data-testid='issue-labels']//span[contains(text(), '" + labelName + "')]").exists();
+            TextElement labelElement = TextElement.byXpath("//div[@data-testid='issue-labels']//span[contains(text(), '" + labelName + "')]");
+            return issueLabelsContainer.exists() && labelElement.exists();
         } catch (Exception e) {
             log.error("Ошибка при проверке метки: {}", e.getMessage());
             return false;
@@ -237,34 +177,6 @@ public class IssueActionsComponent extends BaseComponent {
         } catch (Exception e) {
             log.error("Ошибка при проверке назначения текущего пользователя: {}", e.getMessage());
             return false;
-        }
-    }
-    
-    /**
-     * Получает список всех назначенных исполнителей
-     * @return список имен исполнителей
-     */
-    public java.util.List<String> getAssignees() {
-        try {
-            ElementsCollection assigneeElements = $$x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//a");
-            return assigneeElements.texts();
-        } catch (Exception e) {
-            log.error("Ошибка при получении списка исполнителей: {}", e.getMessage());
-            return java.util.Collections.emptyList();
-        }
-    }
-    
-    /**
-     * Получает список всех меток
-     * @return список названий меток
-     */
-    public java.util.List<String> getLabels() {
-        try {
-            ElementsCollection labelElements = $$x("//div[@data-testid='issue-labels']//span");
-            return labelElements.texts();
-        } catch (Exception e) {
-            log.error("Ошибка при получении списка меток: {}", e.getMessage());
-            return java.util.Collections.emptyList();
         }
     }
 }

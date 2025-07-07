@@ -1,7 +1,6 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.tests.BaseTest;
 import ru.github.pages.*;
 import ru.github.utils.ConfigReader;
 
@@ -45,10 +44,10 @@ public class IssueAssignmentTest extends BaseTest {
         assertTrue(issueActions.isLabelSelected(LABEL_NAME), "Метка должна быть назначена issue");
     }
 
-    // /**
-    //  * Тест поиска несуществующей метки
-    //  * Проверяет поведение системы при поиске метки, которая не существует
-    //  */
+    /**
+     * Тест поиска несуществующей метки
+     * Проверяет поведение системы при поиске метки, которая не существует
+     */
     @Test
     public void testSearchNonExistentLabel() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);

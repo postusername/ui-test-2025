@@ -1,7 +1,6 @@
 package ru.github.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.github.tests.BaseTest;
 import ru.github.pages.IssueDetailsPage;
 import ru.github.pages.IssuesListPage;
 import ru.github.pages.MainPage;
@@ -59,6 +58,7 @@ public class IssueCreationTest extends BaseTest {
     @Test
     public void testEditIssueTitle() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
+        issueDetailsPage.clickEdit();
         issueDetailsPage.editTitle(UPDATED_TITLE_PART); // Github не даёт адекватно менять форму ботами, поэтому изгаляемся
         assertEquals(UPDATED_TITLE, issueDetailsPage.getTitle(), "Заголовок должен быть обновлен");
     }
