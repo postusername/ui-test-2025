@@ -14,8 +14,7 @@ import static com.codeborne.selenide.Selenide.*;
 public class HeaderComponent extends BaseComponent {
     
     private final ButtonElement userMenu = ButtonElement.byXpath("//button[@aria-label='View profile and more'] | //button[contains(@aria-label, 'profile')] | //summary[contains(@aria-label, 'menu')]");
-    private final ImageElement userAvatar = ImageElement.byCssSelector("img[alt*='@'][data-testid='github-avatar']");
-    private final ButtonElement signOutButton = ButtonElement.byXpath("//a[contains(text(), 'Sign out')] | //button[contains(text(), 'Sign out')]");
+    private final ImageElement userAvatar = ImageElement.byCssSelector("img.avatar.circle");
     private final ButtonElement profileLink = ButtonElement.byXpath("//a[contains(text(), 'Your profile')] | //a[contains(@href, '/profile')]");
     private final InputElement searchField = InputElement.byName("q");
     private final ImageElement githubLogo = ImageElement.byCssSelector(".octicon-mark-github");
@@ -46,9 +45,7 @@ public class HeaderComponent extends BaseComponent {
     public void openUserMenu() {
         log.info("Открытие меню пользователя");
         
-        if (userMenu.exists()) {
-            userMenu.click();
-        } else if (userAvatar.exists()) {
+        if (userAvatar.exists()) {
             userAvatar.click();
         } else if (dropdownCaret.exists()) {
             dropdownCaret.click();
@@ -77,9 +74,14 @@ public class HeaderComponent extends BaseComponent {
     public void signOut() {
         log.info("Выход из системы");
         openUserMenu();
-        
+
+        ButtonElement signOutButton = ButtonElement.byXpath("//a[@href='/logout'] | //a[contains(text(), 'Sign out')] | //button[contains(text(), 'Sign out')]");
+        signOutButton.waitForVisible();
         if (signOutButton.exists()) {
             signOutButton.click();
+            ButtonElement signOutConfirmButton = ButtonElement.byXpath("//input[@data-disable-with='Sign out from all accounts']");
+            signOutConfirmButton.waitForVisible();
+            signOutConfirmButton.click();
         } else {
             log.warn("Кнопка выхода не найдена в меню");
         }
