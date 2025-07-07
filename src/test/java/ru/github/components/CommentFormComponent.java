@@ -1,5 +1,6 @@
 package ru.github.components;
 
+import ru.github.components.elements.TextElement;
 import ru.github.components.elements.TextareaElement;
 import ru.github.components.elements.ButtonElement;
 
@@ -8,8 +9,8 @@ import ru.github.components.elements.ButtonElement;
  */
 public class CommentFormComponent extends BaseComponent {
     
-    private final TextareaElement commentField = TextareaElement.byPlaceholder("comment");
-    private final ButtonElement commentButton = ButtonElement.byXpath("//button[contains(text(), 'Comment')] | //button[@type='submit'][contains(@class, 'btn-primary')]");
+    private final TextareaElement commentField = TextareaElement.byPlaceholder("Use Markdown to format your comment");
+    private final ButtonElement commentButton = ButtonElement.byXpath("//button[contains(@class, 'prc-Button-ButtonBase-c50BI') and contains(., 'Comment')]");
     
     /**
      * Конструктор компонента формы комментариев
@@ -103,5 +104,17 @@ public class CommentFormComponent extends BaseComponent {
         log.info("Клик по полю комментария");
         commentField.click();
         return this;
+    }
+
+    public boolean isCommentWithTextExists(String commentText) {
+        try {
+            TextElement markdownBody = TextElement.byCssSelector("[data-testid*='comment-viewer-outer-box'] [data-testid='markdown-body']");
+            markdownBody.waitForVisible();
+            log.info("Текст комментария: {}", markdownBody.getText());
+            return markdownBody.exists() && commentText.equals(markdownBody.getText());
+        } catch (Exception e) {
+            log.warn("Ошибка при поиске комментария с текстом '{}': {}", commentText, e.getMessage());
+            return false;
+        }
     }
 }

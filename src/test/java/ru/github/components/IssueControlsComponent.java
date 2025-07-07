@@ -16,7 +16,7 @@ public class IssueControlsComponent extends BaseComponent {
     private final ButtonElement closeButton = ButtonElement.byXpath("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
     private final ButtonElement reopenButton = ButtonElement.byXpath("//div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup--k8eny')]//button[1] | //div[contains(@class, 'IssueActions-module__IssueActionsButtonGroup') and contains(@class, 'prc-ButtonGroup-ButtonGroup')]//button[1]");
     private final ButtonElement pinButton = ButtonElement.byXpath("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
-    private final ButtonElement lockButton = ButtonElement.byXpath("//button[contains(text(), 'Lock conversation')] | //a[contains(text(), 'Lock conversation')]");
+    private final ButtonElement lockButton = new ButtonElement($$(".prc-ActionList-ActionListContent-sg9-x").filterBy(visible).get(1));
     
     private final ButtonElement actionMenuButton = ButtonElement.byXpath("//button[@aria-label='Issue body actions'] | //button[contains(@aria-label, 'actions')]");
     private final ButtonElement menuEditButton = ButtonElement.byXpath("//div[@role='menu']//button[contains(text(), 'Edit')] | //div[@role='menu']//a[contains(text(), 'Edit')]");
@@ -24,8 +24,8 @@ public class IssueControlsComponent extends BaseComponent {
     private final ButtonElement menuPinButton = ButtonElement.byXpath("//button[contains(text(), 'Pin issue')] | //span[contains(text(), 'Pin issue')]//ancestor::button | //*[contains(text(), 'Pin issue')]//ancestor::button");
     private final ButtonElement menuLockButton = ButtonElement.byXpath("//div[@role='menu']//button[contains(text(), 'Lock')] | //div[@role='menu']//a[contains(text(), 'Lock')]");
     
-    private final ButtonElement lockConfirmButton = ButtonElement.byXpath("//button[contains(text(), 'Lock conversation') and contains(@class, 'btn-danger')]");
-    private final TextElement lockedMessage = TextElement.byXpath("//div[contains(text(), 'locked')] | //div[contains(@class, 'locked')]");
+    private final ButtonElement lockConfirmButton = new ButtonElement($$(".prc-Button-ButtonBase-c50BI").filterBy(visible).get(2));
+    private final TextElement lockedMessage = new TextElement($$(".row-module__timelineBodyContent--yAgzD").filterBy(visible).first());
     
     /**
      * Конструктор компонента кнопок управления issue
@@ -147,11 +147,13 @@ public class IssueControlsComponent extends BaseComponent {
                 log.warn("Кнопка Lock conversation не найдена ни в основном интерфейсе, ни в меню");
             }
         }
-        
+
         if (lockConfirmButton.exists()) {
             lockConfirmButton.click();
         }
         
+        lockedMessage.waitForVisible();
+
         return this;
     }
     

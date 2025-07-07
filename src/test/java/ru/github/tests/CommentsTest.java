@@ -24,6 +24,7 @@ public class CommentsTest extends BaseTest {
     public void testAddCommentToIssue() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
         issueDetailsPage.addComment(COMMENT_TEXT);
+        assertTrue(issueDetailsPage.isCommentWithTextExists(COMMENT_TEXT), "Комментарий не добавлен");
         log.info("Комментарий успешно добавлен");
     }
 
@@ -35,7 +36,7 @@ public class CommentsTest extends BaseTest {
     public void testLockConversation() {
         IssueDetailsPage issueDetailsPage = createIssue(ISSUE_TITLE, ISSUE_DESCRIPTION);
         issueDetailsPage.clickLockConversation();
-        log.info("Обсуждение успешно заблокировано");
         assertTrue(issueDetailsPage.isConversationLocked(), "Обсуждение должно быть заблокировано");
+        log.info("Обсуждение успешно заблокировано");
     }
 }

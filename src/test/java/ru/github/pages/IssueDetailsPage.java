@@ -1,6 +1,9 @@
 package ru.github.pages;
 
 import ru.github.components.elements.TextElement;
+
+import java.util.function.BooleanSupplier;
+
 import ru.github.components.CommentComponent;
 import ru.github.components.CommentFormComponent;
 import ru.github.components.IssueActionsComponent;
@@ -210,5 +213,9 @@ public class IssueDetailsPage extends BasePage {
     protected void waitForPageLoad() {
         log.debug("Ожидание загрузки страницы деталей issue");
         issueInfo.waitForLoad();
+    }
+
+    public boolean isCommentWithTextExists(String commentText) {
+        return commentForm.isCommentWithTextExists(commentText);
     }
 }

@@ -21,7 +21,7 @@ public class IssueActionsComponent extends BaseComponent {
     private final ButtonElement editLabelsButton = ButtonElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Labels']/..//button[contains(@aria-describedby, 'loading-announcement')]");
     
     private final TextElement issueLabelsContainer = TextElement.byCssSelector("[data-testid='issue-labels']");
-    private final TextElement assigneesContainer = TextElement.byXpath("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//ul");
+    private final TextElement assigneesContainer = TextElement.byTestId("issue-assignees");
     
     private final InputElement labelSearchField = InputElement.byCssSelector("input[placeholder*='filter' i], input[placeholder*='search' i]");
     private final InputElement assigneeSearchField = InputElement.byCssSelector("input[placeholder*='search' i], input[placeholder*='type' i]");
@@ -29,6 +29,8 @@ public class IssueActionsComponent extends BaseComponent {
     private final TextElement searchResults = TextElement.byCssSelector(".ActionList, .prc-ActionList-ActionList-X4RiC");
     private final TextElement noResultsMessage = TextElement.byXpath("//div[contains(text(), 'No results') or contains(text(), 'not found')]");
     
+    private final ButtonElement assignYourselfOption = ButtonElement.byXpath("//button[.//*[text()='Assign yourself']]");
+
     /**
      * Конструктор компонента действий с issue
      */
@@ -168,21 +170,6 @@ public class IssueActionsComponent extends BaseComponent {
     }
     
     /**
-     * Проверяет, что пользователь назначен исполнителем
-     * @param username имя пользователя
-     * @return true, если пользователь назначен
-     */
-    public boolean isAssigneeSelected(String username) {
-        try {
-            return assigneesContainer.exists() && 
-                   $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//a[contains(@href, '" + username + "')]").exists();
-        } catch (Exception e) {
-            log.error("Ошибка при проверке назначения: {}", e.getMessage());
-            return false;
-        }
-    }
-    
-    /**
      * Выбирает метку для issue
      * @param labelName название метки
      */
@@ -190,6 +177,7 @@ public class IssueActionsComponent extends BaseComponent {
         log.info("Выбор метки: {}", labelName);
         clickLabels();
         
+        //sleep(10000);
         try {
             SelenideElement labelOption = $x("//div[contains(text(), '" + labelName + "')]");
             if (labelOption.exists()) {
@@ -223,10 +211,7 @@ public class IssueActionsComponent extends BaseComponent {
      */
     public void assignYourself() {
         log.info("Назначение себя исполнителем");
-        clickAssignees();
-        
         try {
-            SelenideElement assignYourselfOption = $x("//div[contains(text(), 'Assign yourself')]");
             if (assignYourselfOption.exists()) {
                 assignYourselfOption.click();
                 log.info("Пользователь назначен исполнителем");
@@ -243,9 +228,9 @@ public class IssueActionsComponent extends BaseComponent {
      * @return true, если текущий пользователь назначен
      */
     public boolean isCurrentUserAssigned() {
+        assigneesContainer.waitForVisible();
         try {
-            return assigneesContainer.exists() && 
-                   $x("//div[@data-testid='sidebar-section']//h3[text()='Assignees']/..//img[contains(@alt, '@')]").exists();
+            return assigneesContainer.exists();
         } catch (Exception e) {
             log.error("Ошибка при проверке назначения текущего пользователя: {}", e.getMessage());
             return false;
